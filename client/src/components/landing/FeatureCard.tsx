@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ElementType } from 'react';
+import type { ElementType } from 'react';
 
 interface FeatureCardProps {
     title: string;
