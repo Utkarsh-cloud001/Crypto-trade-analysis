@@ -10,11 +10,14 @@ export const options = {
 };
 
 export default function () {
-    const BASE_URL = 'http://localhost'; // Load balancer URL
+    const BASE_URL = 'http://load-balancer'; // Use Docker service name
 
     // 1. Visit Landing Page
     let res = http.get(`${BASE_URL}/`);
-    check(res, { 'status was 200': (r) => r.status == 200 });
+    const checkRes = check(res, { 'status was 200': (r) => r.status == 200 });
+    if (!checkRes) {
+        console.log(`Request failed. Status: ${res.status}, Body: ${res.body}`);
+    }
     sleep(1);
 
     // 2. Visit API Health Check (if exists) or just root API

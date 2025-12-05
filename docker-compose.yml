@@ -14,8 +14,7 @@ services:
 
   server:
     build: ./server
-    container_name: crypto-server
-    # Remove ports mapping to allow scaling without conflicts
+    # container_name: crypto-server  <-- Removed to allow scaling
     expose:
       - "5000"
     environment:
@@ -46,6 +45,13 @@ services:
       - mongo-data:/data/db
     networks:
       - mern-network
+
+  k6:
+    image: grafana/k6:latest
+    networks:
+      - mern-network
+    volumes:
+      - ./load-test:/scripts
 
 networks:
   mern-network:

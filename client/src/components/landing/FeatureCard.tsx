@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
-import type { ElementType } from 'react';
+import type { ComponentType } from 'react';
 
 interface FeatureCardProps {
     title: string;
     description: string;
-    icon: ElementType;
+    icon: any;
     delay: number;
 }
 
