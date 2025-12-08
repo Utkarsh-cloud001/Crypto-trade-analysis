@@ -6,6 +6,11 @@ export interface IUser extends Document {
     email: string;
     passwordHash: string;
     role: 'user' | 'admin';
+    settings?: {
+        currency: string;
+        dateFormat: string;
+        pnlType: 'absolute' | 'percentage';
+    };
     createdAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
@@ -31,6 +36,11 @@ const userSchema = new Schema<IUser>({
         type: String,
         enum: ['user', 'admin'],
         default: 'user',
+    },
+    settings: {
+        currency: { type: String, default: 'USD' },
+        dateFormat: { type: String, default: 'YYYY-MM-DD' },
+        pnlType: { type: String, enum: ['absolute', 'percentage'], default: 'absolute' },
     },
 }, {
     timestamps: true,

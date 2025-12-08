@@ -38,6 +38,11 @@ const Profile = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    // Settings
+    const [currency, setCurrency] = useState('USD');
+    const [dateFormat, setDateFormat] = useState('YYYY-MM-DD');
+    const [pnlType, setPnlType] = useState('absolute');
+
     // Tags
     const [tags, setTags] = useState<Tag[]>([]);
     const [showTagModal, setShowTagModal] = useState(false);
@@ -53,6 +58,11 @@ const Profile = () => {
         if (user) {
             setName(user.name || '');
             setEmail(user.email || '');
+            if (user.settings) {
+                setCurrency(user.settings.currency || 'USD');
+                setDateFormat(user.settings.dateFormat || 'YYYY-MM-DD');
+                setPnlType(user.settings.pnlType || 'absolute');
+            }
         }
         fetchTags();
     }, [user]);
@@ -78,6 +88,29 @@ const Profile = () => {
             login(res.data.token, res.data);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to update personal info');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSettingsSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setMessage('');
+        setError('');
+        setLoading(true);
+
+        try {
+            const res = await api.put('/auth/profile', {
+                settings: {
+                    currency,
+                    dateFormat,
+                    pnlType
+                }
+            });
+            setMessage('Settings updated successfully');
+            login(res.data.token, res.data);
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Failed to update settings');
         } finally {
             setLoading(false);
         }
@@ -185,9 +218,31 @@ const Profile = () => {
     ];
 
     return (
-        <div className="flex gap-6 h-full">
-            {/* Sidebar */}
-            <aside className="w-64 bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-4">
+        <div className="flex flex-col md:flex-row gap-6 h-full">
+            {/* Mobile Navigation */}
+            <div className="md:hidden w-full bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 mb-4 overflow-x-auto">
+                <div className="flex gap-2 min-w-max">
+                    {sidebarItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveSection(item.id)}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm whitespace-nowrap ${activeSection === item.id
+                                    ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                                    } ${item.danger ? 'text-red-400 hover:text-red-300' : ''}`}
+                            >
+                                <Icon className="w-4 h-4" />
+                                <span>{item.label}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Sidebar (Desktop) */}
+            <aside className="hidden md:block w-64 bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 h-fit">
                 <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     Profile Settings
                 </h2>
@@ -212,7 +267,7 @@ const Profile = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 overflow-y-auto">
+            <main className="flex-1 bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 overflow-y-auto">
                 {message && (
                     <div className="mb-6 p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
                         {message}
@@ -228,7 +283,7 @@ const Profile = () => {
                 {activeSection === 'personal' && (
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                         <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
-                        <form onSubmit={handlePersonalInfoSubmit} className="space-y-6">
+                        <form onSubmit={handlePersonalInfoSubmit} className="space-y-6 max-w-lg">
                             <div>
                                 <label className="text-sm font-medium text-slate-300 mb-2 block">Name</label>
                                 <input
@@ -259,23 +314,62 @@ const Profile = () => {
                 {/* Account Settings Section */}
                 {activeSection === 'settings' && (
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                        <h2 className="text-2xl font-bold mb-6">Edit Settings</h2>
-                        <div className="space-y-4 text-slate-400">
-                            <p>Account settings features coming soon...</p>
-                            <ul className="list-disc list-inside space-y-2 text-sm">
-                                <li>Currency format preferences</li>
-                                <li>Default date ordering</li>
-                                <li>Trading symbol defaults</li>
-                                <li>PnL calculation type</li>
-                            </ul>
-                        </div>
+                        <h2 className="text-2xl font-bold mb-6">Account Settings</h2>
+                        <form onSubmit={handleSettingsSubmit} className="space-y-6 max-w-lg">
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-2 block">Currency</label>
+                                <select
+                                    value={currency}
+                                    onChange={(e) => setCurrency(e.target.value)}
+                                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                >
+                                    <option value="USD">USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="GBP">GBP (£)</option>
+                                    <option value="INR">INR (₹)</option>
+                                    <option value="AUD">AUD ($)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-2 block">Date Format</label>
+                                <select
+                                    value={dateFormat}
+                                    onChange={(e) => setDateFormat(e.target.value)}
+                                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                >
+                                    <option value="YYYY-MM-DD">YYYY-MM-DD (2025-12-31)</option>
+                                    <option value="DD-MM-YYYY">DD-MM-YYYY (31-12-2025)</option>
+                                    <option value="MM/DD/YYYY">MM/DD/YYYY (12/31/2025)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-2 block">PnL Type</label>
+                                <select
+                                    value={pnlType}
+                                    onChange={(e) => setPnlType(e.target.value)}
+                                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                >
+                                    <option value="absolute">Absolute Value ($)</option>
+                                    <option value="percentage">Percentage (%)</option>
+                                </select>
+                                <p className="text-xs text-slate-500 mt-1">
+                                    Determines how Profit/Loss is displayed in charts.
+                                </p>
+                            </div>
+
+                            <Button type="submit" disabled={loading}>
+                                {loading ? 'Saving...' : 'Save Settings'}
+                            </Button>
+                        </form>
                     </motion.div>
                 )}
 
                 {/* Tag Management Section */}
                 {activeSection === 'tags' && (
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
                             <h2 className="text-2xl font-bold">Tag Management</h2>
                             <Button
                                 onClick={() => {
@@ -283,7 +377,7 @@ const Profile = () => {
                                     setTagForm({ name: '', category: '', description: '' });
                                     setShowTagModal(true);
                                 }}
-                                className="gap-2"
+                                className="gap-2 w-full sm:w-auto"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add Tag
@@ -294,8 +388,8 @@ const Profile = () => {
                             {tags.length === 0 ? (
                                 <p className="text-slate-400 text-center py-8">No tags yet. Create your first tag!</p>
                             ) : (
-                                <div className="bg-slate-900/50 border border-slate-800 rounded-lg overflow-hidden">
-                                    <table className="w-full">
+                                <div className="bg-slate-900/50 border border-slate-800 rounded-lg overflow-x-auto">
+                                    <table className="w-full min-w-[600px]">
                                         <thead className="bg-slate-800/50">
                                             <tr>
                                                 <th className="px-4 py-3 text-left text-sm font-medium text-slate-300">Name</th>
@@ -344,7 +438,7 @@ const Profile = () => {
 
                         {/* Tag Modal */}
                         {showTagModal && (
-                            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -410,7 +504,7 @@ const Profile = () => {
                 {activeSection === 'password' && (
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                         <h2 className="text-2xl font-bold mb-6">Edit Password & Security</h2>
-                        <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-md">
+                        <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-lg">
                             <div>
                                 <label className="text-sm font-medium text-slate-300 mb-2 block">
                                     Password (6 Char min)
@@ -448,7 +542,7 @@ const Profile = () => {
                 {activeSection === 'danger' && (
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                         <h2 className="text-2xl font-bold mb-6 text-red-400">Danger Zone</h2>
-                        <div className="space-y-6">
+                        <div className="space-y-6 max-w-2xl">
                             <div className="border border-red-500/20 rounded-lg p-6 bg-red-500/5">
                                 <h3 className="text-lg font-semibold text-red-400 mb-2">Delete All Journal Data</h3>
                                 <p className="text-slate-400 text-sm mb-4">

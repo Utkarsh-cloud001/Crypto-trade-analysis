@@ -6,6 +6,11 @@ interface User {
     name: string;
     email: string;
     role: string;
+    settings?: {
+        currency: string;
+        dateFormat: string;
+        pnlType: 'absolute' | 'percentage';
+    };
 }
 
 interface AuthContextType {

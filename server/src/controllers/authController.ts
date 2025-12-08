@@ -49,6 +49,7 @@ export const registerUser = async (req: Request, res: Response) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                settings: user.settings,
                 token: generateToken(user._id.toString()),
             });
         } else {
@@ -77,6 +78,7 @@ export const loginUser = async (req: Request, res: Response) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                settings: user.settings,
                 token: generateToken(user._id.toString()),
             });
         } else {
@@ -98,6 +100,13 @@ export const updateUserProfile = async (req: Request, res: Response) => {
                 user.passwordHash = req.body.password;
             }
 
+            if (req.body.settings) {
+                user.settings = {
+                    ...user.settings,
+                    ...req.body.settings
+                };
+            }
+
             const updatedUser = await user.save();
 
             res.json({
@@ -105,6 +114,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
                 name: updatedUser.name,
                 email: updatedUser.email,
                 role: updatedUser.role,
+                settings: updatedUser.settings,
                 token: generateToken(updatedUser._id.toString()),
             });
         } else {
