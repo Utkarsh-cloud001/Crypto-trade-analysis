@@ -1,10 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
-import xss from 'xss';
+
+// Simple HTML entity escaping - prevents XSS without external dependencies
+const escapeHtml = (str: string): string => {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
 
 // Sanitize inputs recursively
 const sanitize = (obj: any): any => {
     if (typeof obj === 'string') {
-        return xss(obj);
+        return escapeHtml(obj);
     }
     if (Array.isArray(obj)) {
         return obj.map(sanitize);
