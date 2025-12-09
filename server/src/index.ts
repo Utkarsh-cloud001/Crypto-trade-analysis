@@ -20,9 +20,25 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+import rateLimit from 'express-rate-limit';
+import { sanitizeInputs } from './middleware/securityMiddleware';
+
+// ... imports
+
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+});
+app.use(limiter);
+
+// Data Sanitization
+app.use(sanitizeInputs);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/trades', tradeRoutes);

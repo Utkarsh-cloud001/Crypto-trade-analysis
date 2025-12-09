@@ -15,6 +15,8 @@ import HowItWorks from './pages/HowItWorks';
 import Terms from './pages/Terms';
 import Blog from './pages/Blog';
 import { AccountProvider } from './context/AccountContext';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 
 import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
@@ -31,10 +33,16 @@ const AnimatedRoutes = () => {
         <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
         <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
 
+
+
+        // ...
+
         {/* Public Auth Routes */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
           <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
+          <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+          <Route path="/reset-password/:token" element={<PageTransition><ResetPassword /></PageTransition>} />
         </Route>
 
         {/* Protected Routes */}

@@ -11,6 +11,8 @@ export interface IUser extends Document {
         dateFormat: string;
         pnlType: 'absolute' | 'percentage';
     };
+    resetPasswordToken?: string;
+    resetPasswordExpire?: Date;
     createdAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
@@ -42,6 +44,8 @@ const userSchema = new Schema<IUser>({
         dateFormat: { type: String, default: 'YYYY-MM-DD' },
         pnlType: { type: String, enum: ['absolute', 'percentage'], default: 'absolute' },
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
 }, {
     timestamps: true,
 });
