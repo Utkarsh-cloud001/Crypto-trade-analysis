@@ -35,8 +35,6 @@ const AnimatedRoutes = () => {
 
 
 
-        // ...
-
         {/* Public Auth Routes */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
