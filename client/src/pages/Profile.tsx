@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import api from '../services/api';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     User as UserIcon,
     Settings,
@@ -14,6 +14,8 @@ import {
     Edit2,
     Trash2,
     Plus,
+    Menu,
+    X,
 } from 'lucide-react';
 
 interface Tag {
@@ -29,6 +31,7 @@ const Profile = () => {
     const { user, login, logout } = useAuth();
     const navigate = useNavigate();
     const [activeSection, setActiveSection] = useState<Section>('personal');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Personal Info
     const [name, setName] = useState('');
@@ -217,53 +220,83 @@ const Profile = () => {
         { id: 'danger' as Section, label: 'Danger', icon: AlertTriangle, danger: true },
     ];
 
+    const SidebarContent = () => (
+        <>
+            <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Profile Settings
+            </h2>
+            <nav className="space-y-2">
+                {sidebarItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                        <button
+                            key={item.id}
+                            onClick={() => {
+                                setActiveSection(item.id);
+                                setIsMobileMenuOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeSection === item.id
+                                ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                                } ${item.danger ? 'text-red-400 hover:text-red-300' : ''}`}
+                        >
+                            <Icon className="w-5 h-5" />
+                            <span className="font-medium">{item.label}</span>
+                        </button>
+                    );
+                })}
+            </nav>
+        </>
+    );
+
     return (
-        <div className="flex flex-col md:flex-row gap-6 h-full">
-            {/* Mobile Navigation */}
-            <div className="md:hidden w-full bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 mb-4 overflow-x-auto">
-                <div className="flex gap-2 min-w-max">
-                    {sidebarItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={() => setActiveSection(item.id)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm whitespace-nowrap ${activeSection === item.id
-                                    ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
-                                    } ${item.danger ? 'text-red-400 hover:text-red-300' : ''}`}
-                            >
-                                <Icon className="w-4 h-4" />
-                                <span>{item.label}</span>
-                            </button>
-                        );
-                    })}
-                </div>
+        <div className="flex flex-col md:flex-row gap-6 h-full relative">
+            {/* Mobile Actions Header */}
+            <div className="md:hidden flex items-center justify-between mb-2">
+                <button
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="p-2 bg-slate-900/40 border border-slate-800 rounded-lg text-slate-400 hover:text-white"
+                >
+                    <Menu className="w-6 h-6" />
+                </button>
             </div>
+
+            {/* Mobile Sidebar Overlay */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
+                        />
+                        <motion.aside
+                            initial={{ x: -300 }}
+                            animate={{ x: 0 }}
+                            exit={{ x: -300 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed top-0 left-0 h-full w-72 bg-slate-900 border-r border-slate-800 z-50 p-6 md:hidden overflow-y-auto"
+                        >
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-lg font-bold text-slate-300">Menu</span>
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-2 hover:bg-slate-800 rounded-lg text-slate-400"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <SidebarContent />
+                        </motion.aside>
+                    </>
+                )}
+            </AnimatePresence>
 
             {/* Sidebar (Desktop) */}
             <aside className="hidden md:block w-64 bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 h-fit">
-                <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Profile Settings
-                </h2>
-                <nav className="space-y-2">
-                    {sidebarItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={() => setActiveSection(item.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeSection === item.id
-                                    ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
-                                    } ${item.danger ? 'text-red-400 hover:text-red-300' : ''}`}
-                            >
-                                <Icon className="w-5 h-5" />
-                                <span className="font-medium">{item.label}</span>
-                            </button>
-                        );
-                    })}
-                </nav>
+                <SidebarContent />
             </aside>
 
             {/* Main Content */}
@@ -577,5 +610,4 @@ const Profile = () => {
         </div>
     );
 };
-
 export default Profile;
