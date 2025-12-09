@@ -69,6 +69,13 @@ const userSchema = new mongoose_1.Schema({
         enum: ['user', 'admin'],
         default: 'user',
     },
+    settings: {
+        currency: { type: String, default: 'USD' },
+        dateFormat: { type: String, default: 'YYYY-MM-DD' },
+        pnlType: { type: String, enum: ['absolute', 'percentage'], default: 'absolute' },
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
 }, {
     timestamps: true,
 });

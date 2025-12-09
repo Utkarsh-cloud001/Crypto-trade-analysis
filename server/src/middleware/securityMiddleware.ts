@@ -1,14 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-
-const window = new JSDOM('').window;
-const DOMPurify = createDOMPurify(window);
+import xss from 'xss';
 
 // Sanitize inputs recursively
 const sanitize = (obj: any): any => {
     if (typeof obj === 'string') {
-        return DOMPurify.sanitize(obj);
+        return xss(obj);
     }
     if (Array.isArray(obj)) {
         return obj.map(sanitize);

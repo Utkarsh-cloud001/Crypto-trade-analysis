@@ -55,6 +55,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                settings: user.settings,
                 token: generateToken(user._id.toString()),
             });
         }
@@ -82,6 +83,7 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                settings: user.settings,
                 token: generateToken(user._id.toString()),
             });
         }
@@ -103,12 +105,16 @@ const updateUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
             if (req.body.password) {
                 user.passwordHash = req.body.password;
             }
+            if (req.body.settings) {
+                user.settings = Object.assign(Object.assign({}, user.settings), req.body.settings);
+            }
             const updatedUser = yield user.save();
             res.json({
                 _id: updatedUser._id,
                 name: updatedUser.name,
                 email: updatedUser.email,
                 role: updatedUser.role,
+                settings: updatedUser.settings,
                 token: generateToken(updatedUser._id.toString()),
             });
         }
