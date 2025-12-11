@@ -30,7 +30,7 @@ import { sanitizeInputs } from './middleware/securityMiddleware';
 
 app.use(cors());
 app.use(helmet());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Increased limit for profile pictures (base64)
 
 // Rate Limiting
 const limiter = rateLimit({
