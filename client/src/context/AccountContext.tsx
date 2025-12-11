@@ -35,19 +35,55 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
 
         try {
             const res = await api.get('/accounts');
-            setAccounts(res.data);
+            let accountsData = res.data;
 
-            // If no account selected, select primary or first
-            if (!selectedAccount && res.data.length > 0) {
-                const primary = res.data.find((a: Account) => a.isPrimary);
-                setSelectedAccount(primary || res.data[0]);
+            // If no accounts exist, create a default demo account locally
+            if (accountsData.length === 0) {
+                const demoAccount: Account = {
+                    _id: 'demo-account',
+                    name: 'Demo Account',
+                    isPrimary: true,
+                    balance: 10000,
+                    currency: 'USD'
+                };
+                accountsData = [demoAccount];
+            }
+
+            setAccounts(accountsData);
+
+            // Check localStorage for previously selected account
+            const savedAccountId = localStorage.getItem('selectedAccountId');
+
+            if (savedAccountId && accountsData.find((a: Account) => a._id === savedAccountId)) {
+                // Restore saved selection
+                const savedAccount = accountsData.find((a: Account) => a._id === savedAccountId);
+                setSelectedAccount(savedAccount || accountsData[0]);
+            } else if (!selectedAccount && accountsData.length > 0) {
+                // If no account selected, select primary or first
+                const primary = accountsData.find((a: Account) => a.isPrimary);
+                const selected = primary || accountsData[0];
+                setSelectedAccount(selected);
+                localStorage.setItem('selectedAccountId', selected._id);
             } else if (selectedAccount) {
                 // Update selected account data
-                const updated = res.data.find((a: Account) => a._id === selectedAccount._id);
-                if (updated) setSelectedAccount(updated);
+                const updated = accountsData.find((a: Account) => a._id === selectedAccount._id);
+                if (updated) {
+                    setSelectedAccount(updated);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch accounts:', error);
+            // Even if API fails, provide a demo account
+            const demoAccount: Account = {
+                _id: 'demo-account-fallback',
+                name: 'Demo Account',
+                isPrimary: true,
+                balance: 10000,
+                currency: 'USD'
+            };
+            setAccounts([demoAccount]);
+            setSelectedAccount(demoAccount);
+            localStorage.setItem('selectedAccountId', demoAccount._id);
         } finally {
             setLoading(false);
         }
@@ -59,7 +95,10 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
 
     const selectAccount = (id: string) => {
         const account = accounts.find(a => a._id === id);
-        if (account) setSelectedAccount(account);
+        if (account) {
+            setSelectedAccount(account);
+            localStorage.setItem('selectedAccountId', id);
+        }
     };
 
     return (
