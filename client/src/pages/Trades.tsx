@@ -4,6 +4,7 @@ import { Plus, Trash2, TrendingUp, TrendingDown, Image as ImageIcon, Edit2 } fro
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import api from '../services/api';
+import ImagePreviewModal from '../components/ImagePreviewModal';
 
 interface Trade {
     _id: string;
@@ -28,6 +29,8 @@ const Trades = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [formData, setFormData] = useState({
         pair: '',
         type: 'LONG' as 'LONG' | 'SHORT',
@@ -210,9 +213,27 @@ const Trades = () => {
                                     <td className="px-6 py-4">
                                         <div className="flex gap-2">
                                             {trade.screenshot && (
-                                                <a href={`http://localhost:5000${trade.screenshot}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-colors">
-                                                    <ImageIcon className="w-4 h-4" />
-                                                </a>
+                                                <div className="relative group">
+                                                    <button
+                                                        onClick={() => {
+                                                            setPreviewImage(`http://localhost:5000${trade.screenshot}`);
+                                                            setIsPreviewOpen(true);
+                                                        }}
+                                                        className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-all relative"
+                                                    >
+                                                        <ImageIcon className="w-4 h-4" />
+                                                    </button>
+                                                    {/* Hover Preview Popup */}
+                                                    <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50">
+                                                        <div className="bg-slate-900 border-2 border-blue-500/50 rounded-lg overflow-hidden shadow-2xl">
+                                                            <img
+                                                                src={`http://localhost:5000${trade.screenshot}`}
+                                                                alt="Trade Screenshot Preview"
+                                                                className="w-48 h-32 object-cover"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             )}
                                             <button onClick={() => handleEdit(trade)} className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-colors">
                                                 <Edit2 className="w-4 h-4" />
@@ -404,6 +425,16 @@ const Trades = () => {
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* Image Preview Modal */}
+            <ImagePreviewModal
+                isOpen={isPreviewOpen}
+                imageUrl={previewImage}
+                onClose={() => {
+                    setIsPreviewOpen(false);
+                    setPreviewImage(null);
+                }}
+            />
         </div>
     );
 };
