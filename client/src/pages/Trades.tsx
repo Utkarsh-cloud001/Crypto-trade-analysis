@@ -6,6 +6,11 @@ import { Input } from '../components/ui/Input';
 import api from '../services/api';
 import ImagePreviewModal from '../components/ImagePreviewModal';
 
+// Get base URL for images
+const getBaseURL = () => {
+    return import.meta.env.VITE_API_URL || window.location.origin.replace('3000', '5000');
+};
+
 interface Trade {
     _id: string;
     pair: string;
@@ -216,7 +221,7 @@ const Trades = () => {
                                                 <div className="relative group">
                                                     <button
                                                         onClick={() => {
-                                                            setPreviewImage(`http://localhost:5000${trade.screenshot}`);
+                                                            setPreviewImage(`${getBaseURL()}${trade.screenshot}`);
                                                             setIsPreviewOpen(true);
                                                         }}
                                                         className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-all relative"
@@ -227,7 +232,7 @@ const Trades = () => {
                                                     <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50">
                                                         <div className="bg-slate-900 border-2 border-blue-500/50 rounded-lg overflow-hidden shadow-2xl">
                                                             <img
-                                                                src={`http://localhost:5000${trade.screenshot}`}
+                                                                src={`${getBaseURL()}${trade.screenshot}`}
                                                                 alt="Trade Screenshot Preview"
                                                                 className="w-48 h-32 object-cover"
                                                             />
