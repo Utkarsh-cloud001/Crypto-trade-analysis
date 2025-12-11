@@ -107,6 +107,10 @@ export const updateUserProfile = async (req: Request, res: Response) => {
                 };
             }
 
+            if (req.body.profilePicture !== undefined) {
+                user.profilePicture = req.body.profilePicture;
+            }
+
             const updatedUser = await user.save();
 
             res.json({
@@ -114,6 +118,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
                 name: updatedUser.name,
                 email: updatedUser.email,
                 role: updatedUser.role,
+                profilePicture: updatedUser.profilePicture,
                 settings: updatedUser.settings,
                 token: generateToken(updatedUser._id.toString()),
             });

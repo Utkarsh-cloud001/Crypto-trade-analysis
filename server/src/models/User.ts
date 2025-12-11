@@ -6,6 +6,7 @@ export interface IUser extends Document {
     email: string;
     passwordHash: string;
     role: 'user' | 'admin';
+    profilePicture?: string; // Base64 encoded image
     settings?: {
         currency: string;
         dateFormat: string;
@@ -38,6 +39,10 @@ const userSchema = new Schema<IUser>({
         type: String,
         enum: ['user', 'admin'],
         default: 'user',
+    },
+    profilePicture: {
+        type: String,
+        default: '',
     },
     settings: {
         currency: { type: String, default: 'USD' },

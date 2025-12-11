@@ -16,6 +16,8 @@ import {
     Plus,
     Menu,
     X,
+    Camera,
+    Upload,
 } from 'lucide-react';
 
 interface Tag {
@@ -36,6 +38,8 @@ const Profile = () => {
     // Personal Info
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [profilePicture, setProfilePicture] = useState('');
+    const [profilePicturePreview, setProfilePicturePreview] = useState('');
 
     // Password
     const [password, setPassword] = useState('');
@@ -61,6 +65,8 @@ const Profile = () => {
         if (user) {
             setName(user.name || '');
             setEmail(user.email || '');
+            setProfilePicture((user as any).profilePicture || '');
+            setProfilePicturePreview((user as any).profilePicture || '');
             if (user.settings) {
                 setCurrency(user.settings.currency || 'USD');
                 setDateFormat(user.settings.dateFormat || 'YYYY-MM-DD');
