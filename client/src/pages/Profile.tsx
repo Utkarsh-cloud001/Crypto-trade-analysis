@@ -85,6 +85,25 @@ const Profile = () => {
         }
     };
 
+    const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                setError('Image size must be less than 2MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setProfilePicture(base64String);
+                setProfilePicturePreview(base64String);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handlePersonalInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setMessage('');
@@ -92,7 +111,11 @@ const Profile = () => {
         setLoading(true);
 
         try {
-            const res = await api.put('/auth/profile', { name, email });
+            const res = await api.put('/auth/profile', {
+                name,
+                email,
+                profilePicture
+            });
             setMessage('Personal info updated successfully');
             login(res.data.token, res.data);
         } catch (err: any) {
@@ -323,6 +346,40 @@ const Profile = () => {
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                         <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
                         <form onSubmit={handlePersonalInfoSubmit} className="space-y-6 max-w-lg">
+                            {/* Profile Picture Upload */}
+                            <div className="flex flex-col items-center gap-4 pb-6 border-b border-slate-800">
+                                <div className="relative group">
+                                    {profilePicturePreview ? (
+                                        <img
+                                            src={profilePicturePreview}
+                                            alt="Profile"
+                                            className="w-32 h-32 rounded-full object-cover border-4 border-slate-700 group-hover:border-blue-500 transition-all"
+                                        />
+                                    ) : (
+                                        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-4 border-slate-700 group-hover:border-blue-500 transition-all">
+                                            <UserIcon className="w-16 h-16 text-white" />
+                                        </div>
+                                    )}
+                                    <label
+                                        htmlFor="profile-picture-upload"
+                                        className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 p-3 rounded-full cursor-pointer transition-all shadow-lg group-hover:scale-110"
+                                    >
+                                        <Camera className="w-5 h-5 text-white" />
+                                    </label>
+                                    <input
+                                        id="profile-picture-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleProfilePictureChange}
+                                        className="hidden"
+                                    />
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-sm text-slate-400">Click the camera icon to upload</p>
+                                    <p className="text-xs text-slate-500 mt-1">Max 2MB, JPG/PNG</p>
+                                </div>
+                            </div>
+
                             <div>
                                 <label className="text-sm font-medium text-slate-300 mb-2 block">Name</label>
                                 <input

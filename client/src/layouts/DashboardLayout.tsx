@@ -7,7 +7,7 @@ import HelpWidget from '../components/HelpWidget';
 import AccountWidget from '../components/AccountWidget';
 
 const DashboardLayout = () => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const location = useLocation();
@@ -46,6 +46,29 @@ const DashboardLayout = () => {
             </div>
 
             <AccountWidget />
+
+            {/* User Profile Section */}
+            {user && (
+                <div className="px-4 py-3 border-b border-slate-800/50">
+                    <Link to="/profile" className="flex items-center gap-3 hover:bg-slate-800/30 p-2 rounded-lg transition-all group">
+                        {(user as any).profilePicture ? (
+                            <img
+                                src={(user as any).profilePicture}
+                                alt={user.name}
+                                className="w-10 h-10 rounded-full object-cover border-2 border-slate-700 group-hover:border-blue-500 transition-all"
+                            />
+                        ) : (
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                                <User className="w-5 h-5 text-white" />
+                            </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                        </div>
+                    </Link>
+                </div>
+            )}
 
             <nav className="flex-1 space-y-2 p-4">
                 {navItems.map((item) => (
