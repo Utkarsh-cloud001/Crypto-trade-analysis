@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Activity, PieChart, Calendar } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, PieChart, Calendar, Bitcoin, DollarSign } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import TradeHeatmap from '../components/TradeHeatmap';
 import AnalyticsCharts from '../components/AnalyticsCharts';
+import LiveChartModal from '../components/LiveChartModal';
 
 interface Trade {
     _id: string;
@@ -27,6 +28,8 @@ const Dashboard = () => {
         totalPnL: 0,
         openTrades: 0,
     });
+    const [showChartModal, setShowChartModal] = useState(false);
+    const [selectedSymbol, setSelectedSymbol] = useState<'BTCUSDT' | 'ETHUSDT'>('BTCUSDT');
 
     useEffect(() => {
         fetchTrades();
@@ -114,12 +117,73 @@ const Dashboard = () => {
                 ))}
             </div>
 
+            {/* Crypto Price Cards - Click to view live charts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* BTC Card */}
+                <motion.button
+                    onClick={() => {
+                        setSelectedSymbol('BTCUSDT');
+                        setShowChartModal(true);
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-yellow-500/10 backdrop-blur-xl border border-orange-500/20 p-6 hover:border-orange-500/40 transition-all duration-300 group text-left"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-yellow-500 opacity-0 group-hover:opacity-10 transition-opacity" />
+                    <div className="relative">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-slate-400 text-sm font-medium">Bitcoin</p>
+                                <p className="text-2xl font-bold text-orange-400">BTC/USDT</p>
+                            </div>
+                            <Bitcoin className="w-12 h-12 text-orange-400" />
+                        </div>
+                        <p className="text-xs text-slate-500 mt-4 group-hover:text-slate-400 transition-colors">
+                            Click to view live chart →
+                        </p>
+                    </div>
+                </motion.button>
+
+                {/* ETH Card */}
+                <motion.button
+                    onClick={() => {
+                        setSelectedSymbol('ETHUSDT');
+                        setShowChartModal(true);
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 backdrop-blur-xl border border-purple-500/20 p-6 hover:border-purple-500/40 transition-all duration-300 group text-left"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 opacity-0 group-hover:opacity-10 transition-opacity" />
+                    <div className="relative">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-slate-400 text-sm font-medium">Ethereum</p>
+                                <p className="text-2xl font-bold text-purple-400">ETH/USDT</p>
+                            </div>
+                            <DollarSign className="w-12 h-12 text-purple-400" />
+                        </div>
+                        <p className="text-xs text-slate-500 mt-4 group-hover:text-slate-400 transition-colors">
+                            Click to view live chart →
+                        </p>
+                    </div>
+                </motion.button>
+            </div>
+
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <TradeHeatmap trades={trades} />
                 <AnalyticsCharts trades={trades} />
             </div>
-        </div>
+
+            {/* Live Chart Modal */}
+            <LiveChartModal
+                isOpen={showChartModal}
+                symbol={selectedSymbol}
+                onClose={() => setShowChartModal(false)}
+            />
+        </div >
     );
 };
 
