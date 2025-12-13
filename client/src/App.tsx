@@ -67,15 +67,15 @@ const AnimatedRoutes = () => {
 
 function App() {
   return (
-    <CurrencyProvider>
-      <Router>
-        <AuthProvider>
-          <AccountProvider>
+    <Router>
+      <AuthProvider>
+        <AccountProvider>
+          <CurrencyProvider>
             <AnimatedRoutes />
-          </AccountProvider>
-        </AuthProvider>
-      </Router>
-    </CurrencyProvider>
+          </CurrencyProvider>
+        </AccountProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
