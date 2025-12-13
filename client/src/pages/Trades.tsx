@@ -281,11 +281,17 @@ const Trades = () => {
                                             id="trade-pair"
                                             name="pair"
                                             label="Pair"
+                                            list="pair-options"
                                             placeholder="BTC/USDT"
                                             value={formData.pair}
-                                            onChange={(e) => setFormData({ ...formData, pair: e.target.value })}
+                                            onChange={(e) => setFormData({ ...formData, pair: e.target.value.toUpperCase() })}
                                             required
                                         />
+                                        <datalist id="pair-options">
+                                            {COMMON_PAIRS.map(pair => (
+                                                <option key={pair} value={pair} />
+                                            ))}
+                                        </datalist>
                                         <div>
                                             <label className="text-sm font-medium text-slate-300 mb-2 block">Type</label>
                                             <div className="flex gap-4">
