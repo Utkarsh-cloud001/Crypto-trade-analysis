@@ -8,13 +8,7 @@ interface DecodedToken {
     exp: number;
 }
 
-declare global {
-    namespace Express {
-        interface Request {
-            user?: any;
-        }
-    }
-}
+
 
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
     let token;
@@ -28,7 +22,13 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as DecodedToken;
 
-            req.user = await User.findById(decoded.id).select('-passwordHash');
+            const user = await User.findById(decoded.id).select('-passwordHash');
+            if (user) {
+                req.user = user;
+            } else {
+                res.status(401).json({ message: 'Not authorized, user not found' });
+                return;
+            }
 
             next();
         } catch (error) {

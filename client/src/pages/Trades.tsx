@@ -238,242 +238,244 @@ const Trades = () => {
                                                                 className="w-full h-full object-cover rounded"
                                                             />
                                                         </div>
-                                                    </button>            </div>
+                                                    </button>
                                                 </div>
                                             )}
-                                        <button onClick={() => handleEdit(trade)} className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-colors">
-                                            <Edit2 className="w-4 h-4" />
-                                        </button>
-                                        <button onClick={() => handleDelete(trade._id)} className="p-2 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </td>
+                                            <button onClick={() => handleEdit(trade)} className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-colors">
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => handleDelete(trade._id)} className="p-2 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </td>
                                 </motion.tr>
                             ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                        </tbody>
+                    </table>
+                </div>
+            </div >
 
-            {/* Add/Edit Trade Modal */ }
-    <AnimatePresence>
-        {showModal && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-                >
-                    <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Trade' : 'Add New Trade'}</h2>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <Input
-                            id="trade-pair"
-                            name="pair"
-                            label="Pair"
-                            placeholder="BTC/USDT"
-                            value={formData.pair}
-                            onChange={(e) => setFormData({ ...formData, pair: e.target.value })}
-                            required
-                        />
-                        <div>
-                            <label className="text-sm font-medium text-slate-300 mb-2 block">Type</label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="type"
-                                        value="LONG"
-                                        checked={formData.type === 'LONG'}
-                                        onChange={(e) => setFormData({ ...formData, type: e.target.value as 'LONG' })}
-                                    />
-                                    <span>LONG</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="type"
-                                        value="SHORT"
-                                        checked={formData.type === 'SHORT'}
-                                        onChange={(e) => setFormData({ ...formData, type: e.target.value as 'SHORT' })}
-                                    />
-                                    <span>SHORT</span>
-                                </label>
-                            </div>
-                        </div>
-                        <Input
-                            id="trade-method"
-                            name="method"
-                            label="Method/Strategy (Optional)"
-                            placeholder="e.g., Breakout, Support/Resistance"
-                            value={formData.method}
-                            onChange={(e) => setFormData({ ...formData, method: e.target.value })}
-                        />
-                        <div className="grid grid-cols-2 gap-4">
-                            <Input
-                                id="trade-entryPrice"
-                                name="entryPrice"
-                                label="Entry Price"
-                                type="number"
-                                step="0.01"
-                                placeholder="50000.00"
-                                value={formData.entryPrice}
-                                onChange={(e) => setFormData({ ...formData, entryPrice: e.target.value })}
-                                required
-                            />
-                            <Input
-                                id="trade-amount"
-                                name="amount"
-                                label="Amount"
-                                type="number"
-                                step="0.001"
-                                placeholder="0.5"
-                                value={formData.amount}
-                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Input
-                                id="trade-entryDate"
-                                name="entryDate"
-                                label="Entry Date (Optional)"
-                                type="datetime-local"
-                                value={formData.entryDate}
-                                onChange={(e) => setFormData({ ...formData, entryDate: e.target.value })}
-                            />
-                            <Input
-                                id="trade-fees"
-                                name="fees"
-                                label="Fees (Optional)"
-                                type="number"
-                                step="0.01"
-                                placeholder="0.00"
-                                value={formData.fees}
-                                onChange={(e) => setFormData({ ...formData, fees: e.target.value })}
-                            />
-                        </div>
-                        {editingId && (
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="trade-status" className="text-sm font-medium text-slate-300 mb-2 block">Status</label>
-                                    <select
-                                        id="trade-status"
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={(e) => setFormData({ ...formData, status: e.target.value as 'OPEN' | 'CLOSED' })}
-                                        className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                                    >
-                                        <option value="OPEN">OPEN</option>
-                                        <option value="CLOSED">CLOSED</option>
-                                    </select>
-                                </div>
-                                {formData.status === 'CLOSED' && (
+            {/* Add/Edit Trade Modal */}
+            <AnimatePresence>
+                {
+                    showModal && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                            >
+                                <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Trade' : 'Add New Trade'}</h2>
+                                <form onSubmit={handleSubmit} className="space-y-4">
                                     <Input
-                                        id="trade-exitPrice"
-                                        name="exitPrice"
-                                        label="Exit Price"
-                                        type="number"
-                                        step="0.01"
-                                        placeholder="52000.00"
-                                        value={formData.exitPrice}
-                                        onChange={(e) => setFormData({ ...formData, exitPrice: e.target.value })}
+                                        id="trade-pair"
+                                        name="pair"
+                                        label="Pair"
+                                        placeholder="BTC/USDT"
+                                        value={formData.pair}
+                                        onChange={(e) => setFormData({ ...formData, pair: e.target.value })}
                                         required
                                     />
-                                )}
-                            </div>
-                        )}
-                        <div className="grid grid-cols-2 gap-4">
-                            <Input
-                                id="trade-stopLoss"
-                                name="stopLoss"
-                                label="Stop Loss (Optional)"
-                                type="number"
-                                step="0.01"
-                                placeholder="48000.00"
-                                value={formData.stopLoss}
-                                onChange={(e) => setFormData({ ...formData, stopLoss: e.target.value })}
-                            />
-                            <Input
-                                id="trade-takeProfit"
-                                name="takeProfit"
-                                label="Take Profit (Optional)"
-                                type="number"
-                                step="0.01"
-                                placeholder="55000.00"
-                                value={formData.takeProfit}
-                                onChange={(e) => setFormData({ ...formData, takeProfit: e.target.value })}
-                            />
-                        </div>
-                        <Input
-                            id="trade-notes"
-                            name="notes"
-                            label="Notes (Optional)"
-                            placeholder="Trade setup and reasoning..."
-                            value={formData.notes}
-                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        />
-                        <div className="space-y-2">
-                            <label htmlFor="trade-screenshot" className="text-sm font-medium text-slate-300">Screenshot</label>
-                            <input
-                                id="trade-screenshot"
-                                name="screenshot"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                className="block w-full text-sm text-slate-400
+                                    <div>
+                                        <label className="text-sm font-medium text-slate-300 mb-2 block">Type</label>
+                                        <div className="flex gap-4">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="type"
+                                                    value="LONG"
+                                                    checked={formData.type === 'LONG'}
+                                                    onChange={(e) => setFormData({ ...formData, type: e.target.value as 'LONG' })}
+                                                />
+                                                <span>LONG</span>
+                                            </label>
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="type"
+                                                    value="SHORT"
+                                                    checked={formData.type === 'SHORT'}
+                                                    onChange={(e) => setFormData({ ...formData, type: e.target.value as 'SHORT' })}
+                                                />
+                                                <span>SHORT</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <Input
+                                        id="trade-method"
+                                        name="method"
+                                        label="Method/Strategy (Optional)"
+                                        placeholder="e.g., Breakout, Support/Resistance"
+                                        value={formData.method}
+                                        onChange={(e) => setFormData({ ...formData, method: e.target.value })}
+                                    />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Input
+                                            id="trade-entryPrice"
+                                            name="entryPrice"
+                                            label="Entry Price"
+                                            type="number"
+                                            step="0.01"
+                                            placeholder="50000.00"
+                                            value={formData.entryPrice}
+                                            onChange={(e) => setFormData({ ...formData, entryPrice: e.target.value })}
+                                            required
+                                        />
+                                        <Input
+                                            id="trade-amount"
+                                            name="amount"
+                                            label="Amount"
+                                            type="number"
+                                            step="0.001"
+                                            placeholder="0.5"
+                                            value={formData.amount}
+                                            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Input
+                                            id="trade-entryDate"
+                                            name="entryDate"
+                                            label="Entry Date (Optional)"
+                                            type="datetime-local"
+                                            value={formData.entryDate}
+                                            onChange={(e) => setFormData({ ...formData, entryDate: e.target.value })}
+                                        />
+                                        <Input
+                                            id="trade-fees"
+                                            name="fees"
+                                            label="Fees (Optional)"
+                                            type="number"
+                                            step="0.01"
+                                            placeholder="0.00"
+                                            value={formData.fees}
+                                            onChange={(e) => setFormData({ ...formData, fees: e.target.value })}
+                                        />
+                                    </div>
+                                    {editingId && (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label htmlFor="trade-status" className="text-sm font-medium text-slate-300 mb-2 block">Status</label>
+                                                <select
+                                                    id="trade-status"
+                                                    name="status"
+                                                    value={formData.status}
+                                                    onChange={(e) => setFormData({ ...formData, status: e.target.value as 'OPEN' | 'CLOSED' })}
+                                                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                                >
+                                                    <option value="OPEN">OPEN</option>
+                                                    <option value="CLOSED">CLOSED</option>
+                                                </select>
+                                            </div>
+                                            {formData.status === 'CLOSED' && (
+                                                <Input
+                                                    id="trade-exitPrice"
+                                                    name="exitPrice"
+                                                    label="Exit Price"
+                                                    type="number"
+                                                    step="0.01"
+                                                    placeholder="52000.00"
+                                                    value={formData.exitPrice}
+                                                    onChange={(e) => setFormData({ ...formData, exitPrice: e.target.value })}
+                                                    required
+                                                />
+                                            )}
+                                        </div>
+                                    )}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Input
+                                            id="trade-stopLoss"
+                                            name="stopLoss"
+                                            label="Stop Loss (Optional)"
+                                            type="number"
+                                            step="0.01"
+                                            placeholder="48000.00"
+                                            value={formData.stopLoss}
+                                            onChange={(e) => setFormData({ ...formData, stopLoss: e.target.value })}
+                                        />
+                                        <Input
+                                            id="trade-takeProfit"
+                                            name="takeProfit"
+                                            label="Take Profit (Optional)"
+                                            type="number"
+                                            step="0.01"
+                                            placeholder="55000.00"
+                                            value={formData.takeProfit}
+                                            onChange={(e) => setFormData({ ...formData, takeProfit: e.target.value })}
+                                        />
+                                    </div>
+                                    <Input
+                                        id="trade-notes"
+                                        name="notes"
+                                        label="Notes (Optional)"
+                                        placeholder="Trade setup and reasoning..."
+                                        value={formData.notes}
+                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                    />
+                                    <div className="space-y-2">
+                                        <label htmlFor="trade-screenshot" className="text-sm font-medium text-slate-300">Screenshot</label>
+                                        <input
+                                            id="trade-screenshot"
+                                            name="screenshot"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            className="block w-full text-sm text-slate-400
                                             file:mr-4 file:py-2 file:px-4
                                             file:rounded-full file:border-0
                                             file:text-sm file:font-semibold
                                             file:bg-blue-500/10 file:text-blue-400
                                             hover:file:bg-blue-500/20"
-                            />
-                            {formData.screenshot && (
-                                <div className="flex items-center gap-2 mt-2">
-                                    <p className="text-xs text-green-400">Image uploaded successfully!</p>
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, screenshot: '' }))}
-                                        className="text-xs text-red-400 hover:text-red-300 transition-colors"
-                                    >
-                                        (Remove)
-                                    </button>
-                                </div>
-                            )}
+                                        />
+                                        {formData.screenshot && (
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <p className="text-xs text-green-400">Image uploaded successfully!</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData(prev => ({ ...prev, screenshot: '' }))}
+                                                    className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                                                >
+                                                    (Remove)
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-3 pt-4">
+                                        <Button type="submit" className="flex-1">
+                                            {editingId ? 'Update Trade' : 'Add Trade'}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => {
+                                                setShowModal(false);
+                                                setEditingId(null);
+                                                setFormData({ pair: '', type: 'LONG', method: '', entryPrice: '', stopLoss: '', takeProfit: '', amount: '', notes: '', screenshot: '', status: 'OPEN', exitPrice: '', entryDate: '', fees: '' });
+                                            }}
+                                            className="flex-1"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </form>
+                            </motion.div>
                         </div>
-                        <div className="flex gap-3 pt-4">
-                            <Button type="submit" className="flex-1">
-                                {editingId ? 'Update Trade' : 'Add Trade'}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                    setShowModal(false);
-                                    setEditingId(null);
-                                    setFormData({ pair: '', type: 'LONG', method: '', entryPrice: '', stopLoss: '', takeProfit: '', amount: '', notes: '', screenshot: '', status: 'OPEN', exitPrice: '', entryDate: '', fees: '' });
-                                }}
-                                className="flex-1"
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </motion.div>
-            </div>
-        )}
-    </AnimatePresence>
+                    )
+                }
+            </AnimatePresence >
 
-    {/* Image Preview Modal */ }
-    <ImagePreviewModal
-        isOpen={isPreviewOpen}
-        imageUrl={previewImage}
-        onClose={() => {
-            setIsPreviewOpen(false);
-            setPreviewImage(null);
-        }}
-    />
+            {/* Image Preview Modal */}
+            < ImagePreviewModal
+                isOpen={isPreviewOpen}
+                imageUrl={previewImage}
+                onClose={() => {
+                    setIsPreviewOpen(false);
+                    setPreviewImage(null);
+                }}
+            />
         </div >
     );
 };

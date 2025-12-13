@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Wallet } from 'lucide-react';
-import { Wallet } from 'lucide-react';
+
 import { useAccount } from '../context/AccountContext';
 import { useCurrency } from '../context/CurrencyContext';
 import AccountModal from './AccountModal';

@@ -3,11 +3,7 @@ import { TrendingUp, TrendingDown, Activity, PieChart, Calendar, Bitcoin, Dollar
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import TradeHeatmap from '../components/TradeHeatmap';
-import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Activity, PieChart, Calendar, Bitcoin, DollarSign } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import api from '../services/api';
-import TradeHeatmap from '../components/TradeHeatmap';
+
 import AnalyticsCharts from '../components/AnalyticsCharts';
 import LiveChartModal from '../components/LiveChartModal';
 import { useCurrency } from '../context/CurrencyContext';
