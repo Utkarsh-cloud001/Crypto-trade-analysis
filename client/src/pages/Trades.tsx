@@ -6,11 +6,7 @@ import { Input } from '../components/ui/Input';
 import api from '../services/api';
 import ImagePreviewModal from '../components/ImagePreviewModal';
 import { useCurrency } from '../context/CurrencyContext';
-
-// Get base URL for images
-const getBaseURL = () => {
-    return import.meta.env.VITE_API_URL || window.location.origin.replace('3000', '5000');
-};
+import { getBaseURL } from '../utils/url';
 
 interface Trade {
     _id: string;

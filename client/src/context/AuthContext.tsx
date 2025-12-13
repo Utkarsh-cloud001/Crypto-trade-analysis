@@ -73,12 +73,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [token, logout]);
 
     useEffect(() => {
-        if (token) {
-            // Ideally, verify token with backend here or decode it
-            // For now, we assume if token exists, we might be logged in
-            // In a real app, we'd fetch user profile here
-        }
-    }, [token]);
+        const fetchUser = async () => {
+            if (token) {
+                try {
+                    // Configure auth header since interceptor might not run for this initial call if it's too early
+                    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                    const res = await api.get('/auth/profile');
+                    setUser(res.data);
+                } catch (error) {
+                    console.error('Failed to fetch user profile:', error);
+                    logout();
+                }
+            }
+        };
+
+        fetchUser();
+    }, [token, logout]);
 
     const login = (newToken: string, newUser: User) => {
         localStorage.setItem('token', newToken);
