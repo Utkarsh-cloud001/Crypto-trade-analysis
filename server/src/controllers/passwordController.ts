@@ -46,17 +46,34 @@ export const forgotPassword = async (req: Request, res: Response) => {
         }
 
         const smtpPort = Number(process.env.SMTP_PORT) || 587;
+        const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
 
-        // Create transporter on the fly to ensure we have the latest env vars and catch config errors
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com', // Fallback for testing
-            port: smtpPort,
-            secure: smtpPort === 465, // true for 465, false for other ports
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        });
+        console.log(`Attempting email connection to: ${smtpHost}:${smtpPort} (Secure: ${smtpPort === 465})`);
+
+        let transportConfig: any;
+
+        if (smtpHost.includes('gmail')) {
+            console.log('Using Gmail Service preset');
+            transportConfig = {
+                service: 'gmail',
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS,
+                },
+            };
+        } else {
+            transportConfig = {
+                host: smtpHost,
+                port: smtpPort,
+                secure: smtpPort === 465,
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS,
+                },
+            };
+        }
+
+        const transporter = nodemailer.createTransport(transportConfig);
 
         try {
             await transporter.verify(); // Verify connection config before sending
