@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Edit2, Smile, Meh, Frown } from 'lucide-react';
+import { Plus, Trash2, Edit2, Smile, Meh, Frown, TrendingUp, TrendingDown } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import api from '../services/api';
@@ -14,11 +14,24 @@ interface JournalEntry {
     date: string;
     mood?: 'EXCELLENT' | 'GOOD' | 'NEUTRAL' | 'BAD' | 'TERRIBLE';
     tags?: string[];
+    tags?: string[];
     images?: string[];
+}
+
+interface Trade {
+    _id: string;
+    pair: string;
+    type: 'LONG' | 'SHORT';
+    entryPrice: number;
+    amount: number;
+    pnl?: number;
+    status: 'OPEN' | 'CLOSED';
+    entryDate: string;
 }
 
 const Journal = () => {
     const [entries, setEntries] = useState<JournalEntry[]>([]);
+    const [trades, setTrades] = useState<Trade[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -60,9 +73,23 @@ const Journal = () => {
         } catch (error) {
             console.error('Failed to fetch journal entries:', error);
         } finally {
+        } finally {
             setLoading(false);
         }
     };
+
+    const fetchTrades = async () => {
+        try {
+            const res = await api.get('/trades');
+            setTrades(res.data);
+        } catch (error) {
+            console.error('Failed to fetch trades:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchTrades();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -226,6 +253,38 @@ const Journal = () => {
                                         <img src={`${getBaseURL().replace(/\/api$/, '')}${img}`} alt="attachment" className="w-full h-full object-cover" />
                                     </a>
                                 ))}
+                            </div>
+                        )}
+
+                        {/* Linked Trades Section */}
+                        {trades.filter(t => new Date(t.entryDate).toDateString() === new Date(entry.date).toDateString()).length > 0 && (
+                            <div className="mt-6 pt-4 border-t border-slate-800">
+                                <h4 className="text-sm font-medium text-slate-400 mb-3">Trades from this day</h4>
+                                <div className="space-y-2">
+                                    {trades
+                                        .filter(t => new Date(t.entryDate).toDateString() === new Date(entry.date).toDateString())
+                                        .map(trade => (
+                                            <div key={trade._id} className="bg-slate-900/50 rounded-lg p-3 flex items-center justify-between border border-slate-800/50">
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${trade.type === 'LONG' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                                        {trade.type === 'LONG' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                                                        {trade.type}
+                                                    </span>
+                                                    <span className="font-medium text-slate-200">{trade.pair}</span>
+                                                </div>
+                                                <div className="flex items-center gap-4 text-sm">
+                                                    <span className="text-slate-400">Amt: {trade.amount}</span>
+                                                    {trade.pnl !== undefined ? (
+                                                        <span className={trade.pnl >= 0 ? 'text-green-400 font-medium' : 'text-red-400 font-medium'}>
+                                                            {trade.pnl >= 0 ? '+' : ''}{trade.pnl}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-slate-600">-</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                </div>
                             </div>
                         )}
                     </motion.div>
