@@ -80,7 +80,7 @@ const Login = () => {
             </div>
 
             <a
-                href={`${getBaseURL()}/api/auth/google`}
+                href={`${getBaseURL().replace(/\/api$/, '')}/api/auth/google`}
                 className="flex items-center justify-center w-full px-4 py-2 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors gap-2"
             >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

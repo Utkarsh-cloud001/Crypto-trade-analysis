@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, updateUserProfile, deleteAllJournals, deleteUserAccount } from '../controllers/authController';
+import { registerUser, loginUser, updateUserProfile, getUserProfile, deleteAllJournals, deleteUserAccount } from '../controllers/authController';
 import passport from 'passport';
 import { forgotPassword, resetPassword } from '../controllers/passwordController';
 import { protect } from '../middleware/authMiddleware';
@@ -11,6 +11,7 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:resetToken', resetPassword);
+router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
 router.delete('/journals', protect, deleteAllJournals);
 router.delete('/account', protect, deleteUserAccount);
