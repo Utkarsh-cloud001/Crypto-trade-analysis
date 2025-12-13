@@ -4,20 +4,6 @@ import nodemailer from 'nodemailer';
 import User from '../models/User';
 import bcrypt from 'bcryptjs';
 
-// Setup Nodemailer transporter
-const smtpPort = Number(process.env.SMTP_PORT) || 587;
-
-// Setup Nodemailer transporter
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: smtpPort,
-    secure: smtpPort === 465, // true for 465, false for other ports
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
-
 // @desc    Forgot Password
 // @route   POST /api/auth/forgot-password
 // @access  Public
@@ -53,31 +39,54 @@ export const forgotPassword = async (req: Request, res: Response) => {
             <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
         `;
 
+        // Check for SMTP config presence
+        if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+            console.error('Missing SMTP Credentials');
+            return res.status(500).json({ message: 'Server misconfiguration: Missing SMTP credentials in environment variables.' });
+        }
+
+        const smtpPort = Number(process.env.SMTP_PORT) || 587;
+
+        // Create transporter on the fly to ensure we have the latest env vars and catch config errors
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.gmail.com', // Fallback for testing
+            port: smtpPort,
+            secure: smtpPort === 465, // true for 465, false for other ports
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        });
+
         try {
+            await transporter.verify(); // Verify connection config before sending
+
             await transporter.sendMail({
+                from: process.env.SMTP_USER, // Sender address
                 to: user.email,
                 subject: 'Password Reset Request',
                 html: message,
             });
 
             res.status(200).json({ success: true, data: 'Email sent' });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Email send failed:', error);
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
 
             await user.save();
 
-            // For bad setup, we might want to log the token to be helpful in dev
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Reset URL:', resetUrl);
-                return res.status(200).json({ success: true, data: 'Email failed to send, but here is the link (DEV ONLY)', link: resetUrl });
-            }
-
-            return res.status(500).json({ message: 'Email could not be sent' });
+            // Return actual error message for debugging
+            return res.status(500).json({
+                message: 'Email service failed',
+                error: error.message,
+                code: error.code,
+                command: error.command
+            });
         }
-    } catch (error) {
-        res.status(500).json({ message: 'Server Verification Error', error });
+    } catch (error: any) {
+        console.error('Forgot Password Error:', error);
+        res.status(500).json({ message: 'Server Verification Error', error: error.message });
     }
 };
 
