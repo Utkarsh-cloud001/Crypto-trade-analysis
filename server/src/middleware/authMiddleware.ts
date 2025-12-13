@@ -24,7 +24,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 
             const user = await User.findById(decoded.id).select('-passwordHash');
             if (user) {
-                req.user = user;
+                req.user = user as any;
             } else {
                 res.status(401).json({ message: 'Not authorized, user not found' });
                 return;

@@ -34,13 +34,18 @@ export const createFeature = async (req: Request, res: Response) => {
             return;
         }
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         const { title, description, category } = validation.data;
 
         const feature = await Feature.create({
             title,
             description,
             category: category || 'feature',
-            createdBy: req.user!._id,
+            createdBy: req.user._id as any,
         });
 
         res.status(201).json(feature);
@@ -59,7 +64,12 @@ export const voteFeature = async (req: Request, res: Response) => {
             return;
         }
 
-        const userId = req.user!._id.toString();
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
+        const userId = req.user._id.toString();
         const hasVoted = feature.voters.some(voter => voter.toString() === userId);
 
         if (hasVoted) {
@@ -67,7 +77,7 @@ export const voteFeature = async (req: Request, res: Response) => {
             return;
         }
 
-        feature.voters.push(req.user!._id);
+        feature.voters.push(req.user._id as any);
         feature.votes += 1;
         await feature.save();
 
@@ -87,7 +97,12 @@ export const unvoteFeature = async (req: Request, res: Response) => {
             return;
         }
 
-        const userId = req.user!._id.toString();
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
+        const userId = req.user._id.toString();
         const voterIndex = feature.voters.findIndex(voter => voter.toString() === userId);
 
         if (voterIndex === -1) {

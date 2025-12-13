@@ -11,7 +11,11 @@ const tagSchema = z.object({
 // Get all tags for the authenticated user
 export const getTags = async (req: Request, res: Response) => {
     try {
-        const tags = await Tag.find({ user: req.user!._id }).sort({ createdAt: -1 });
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const tags = await Tag.find({ user: req.user._id as any }).sort({ createdAt: -1 });
         res.json(tags);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -27,10 +31,15 @@ export const createTag = async (req: Request, res: Response) => {
             return;
         }
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         const { name, category, description } = validation.data;
 
         // Check if tag with same name already exists for this user
-        const existingTag = await Tag.findOne({ user: req.user!._id, name });
+        const existingTag = await Tag.findOne({ user: req.user._id as any, name });
         if (existingTag) {
             res.status(400).json({ message: 'Tag with this name already exists' });
             return;
@@ -40,7 +49,7 @@ export const createTag = async (req: Request, res: Response) => {
             name,
             category,
             description,
-            user: req.user!._id,
+            user: req.user._id as any,
         });
 
         res.status(201).json(tag);
@@ -58,7 +67,12 @@ export const updateTag = async (req: Request, res: Response) => {
             return;
         }
 
-        const tag = await Tag.findOne({ _id: req.params.id, user: req.user!._id });
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
+        const tag = await Tag.findOne({ _id: req.params.id, user: req.user._id as any });
 
         if (!tag) {
             res.status(404).json({ message: 'Tag not found' });
@@ -79,7 +93,12 @@ export const updateTag = async (req: Request, res: Response) => {
 // Delete a tag
 export const deleteTag = async (req: Request, res: Response) => {
     try {
-        const tag = await Tag.findOne({ _id: req.params.id, user: req.user!._id });
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
+        const tag = await Tag.findOne({ _id: req.params.id, user: req.user._id as any });
 
         if (!tag) {
             res.status(404).json({ message: 'Tag not found' });

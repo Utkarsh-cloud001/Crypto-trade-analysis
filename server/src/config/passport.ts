@@ -18,7 +18,7 @@ passport.use(
                 let user = await User.findOne({ googleId: profile.id });
 
                 if (user) {
-                    return done(null, user);
+                    return done(null, user as any);
                 }
 
                 // Check if user exists with same email (link accounts)
@@ -28,7 +28,7 @@ passport.use(
                 if (user) {
                     user.googleId = profile.id;
                     await user.save();
-                    return done(null, user);
+                    return done(null, user as any);
                 }
 
                 // Create new user
@@ -39,7 +39,7 @@ passport.use(
                     passwordHash: 'google_auth_' + profile.id, // Dummy password
                 });
 
-                done(null, user);
+                done(null, user as any);
             } catch (error: any) {
                 console.error('Google Auth Error:', error);
                 done(error, undefined);

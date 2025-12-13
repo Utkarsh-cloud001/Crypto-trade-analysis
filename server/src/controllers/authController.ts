@@ -30,12 +30,6 @@ export const registerUser = async (req: Request, res: Response) => {
 
         // Password hashing is handled in User model pre-save hook
         // We pass 'password' to passwordHash field, the hook will hash it
-        // Wait, the hook hashes 'passwordHash'. So we should assign password to passwordHash initially?
-        // Actually, standard practice is to pass plain password and let hook hash it.
-        // But my model has 'passwordHash'. Let's adjust the model usage.
-
-        // Correction: The model expects 'passwordHash'. 
-        // If I pass plain password to 'passwordHash', the hook will hash it.
 
         const user = await User.create({
             name,
@@ -90,7 +84,12 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 export const updateUserProfile = async (req: Request, res: Response) => {
     try {
-        const user = await User.findById(req.user!._id);
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
+        const user = await User.findById(req.user._id);
 
         if (user) {
             user.name = req.body.name || user.name;
@@ -133,7 +132,11 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 // Delete all journal entries for the user
 export const deleteAllJournals = async (req: Request, res: Response) => {
     try {
-        const result = await Journal.deleteMany({ user: req.user!._id });
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const result = await Journal.deleteMany({ user: req.user._id as any });
         res.json({ message: `Deleted ${result.deletedCount} journal entries` });
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -143,13 +146,17 @@ export const deleteAllJournals = async (req: Request, res: Response) => {
 // Delete user account and all associated data
 export const deleteUserAccount = async (req: Request, res: Response) => {
     try {
-        const userId = req.user!._id;
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const userId = req.user._id;
 
         // Delete all user data
         await Promise.all([
-            Journal.deleteMany({ user: userId }),
-            Trade.deleteMany({ user: userId }),
-            Tag.deleteMany({ user: userId }),
+            Journal.deleteMany({ user: userId as any }),
+            Trade.deleteMany({ user: userId as any }),
+            Tag.deleteMany({ user: userId as any }),
             User.findByIdAndDelete(userId),
         ]);
 

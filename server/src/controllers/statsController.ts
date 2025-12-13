@@ -4,7 +4,11 @@ import Trade from '../models/Trade';
 // Get comprehensive trading statistics
 export const getStats = async (req: Request, res: Response) => {
     try {
-        const userId = req.user!._id;
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const userId = req.user._id as any;
         const { startDate, endDate } = req.query;
 
         // Build date filter

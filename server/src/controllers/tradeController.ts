@@ -15,20 +15,25 @@ export const createTrade = async (req: Request, res: Response) => {
             return;
         }
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         let accountId = req.body.account;
         if (!accountId) {
-            const primaryAccount = await Account.findOne({ user: req.user._id, isPrimary: true });
+            const primaryAccount = await Account.findOne({ user: req.user._id as any, isPrimary: true });
             if (primaryAccount) {
                 accountId = primaryAccount._id;
             } else {
-                const anyAccount = await Account.findOne({ user: req.user._id });
+                const anyAccount = await Account.findOne({ user: req.user._id as any });
                 if (anyAccount) accountId = anyAccount._id;
             }
         }
 
         if (!accountId) {
             const newAccount = await Account.create({
-                user: req.user._id,
+                user: req.user._id as any,
                 name: 'Default Account',
                 isPrimary: true,
                 balance: 0
@@ -38,7 +43,7 @@ export const createTrade = async (req: Request, res: Response) => {
 
         const trade = await Trade.create({
             ...validation.data,
-            user: req.user._id,
+            user: req.user._id as any,
             account: accountId,
         });
 
@@ -53,7 +58,11 @@ export const createTrade = async (req: Request, res: Response) => {
 // @access  Private
 export const getTrades = async (req: Request, res: Response) => {
     try {
-        const trades = await Trade.find({ user: req.user._id }).sort({ entryDate: -1 });
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const trades = await Trade.find({ user: req.user._id as any }).sort({ entryDate: -1 });
         res.json(trades);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -69,6 +78,11 @@ export const getTradeById = async (req: Request, res: Response) => {
 
         if (!trade) {
             res.status(404).json({ message: 'Trade not found' });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
             return;
         }
 
@@ -92,6 +106,11 @@ export const updateTrade = async (req: Request, res: Response) => {
 
         if (!trade) {
             res.status(404).json({ message: 'Trade not found' });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
             return;
         }
 
@@ -137,6 +156,11 @@ export const deleteTrade = async (req: Request, res: Response) => {
             return;
         }
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         if (trade.user.toString() !== req.user._id.toString()) {
             res.status(403).json({ message: 'Not authorized' });
             return;
@@ -155,7 +179,11 @@ export const deleteTrade = async (req: Request, res: Response) => {
 // @access  Private
 export const getTradeStats = async (req: Request, res: Response) => {
     try {
-        const trades = await Trade.find({ user: req.user._id });
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const trades = await Trade.find({ user: req.user._id as any });
 
         const totalTrades = trades.length;
         const closedTrades = trades.filter((t) => t.status === 'CLOSED');

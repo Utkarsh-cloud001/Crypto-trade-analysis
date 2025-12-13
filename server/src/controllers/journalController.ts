@@ -24,8 +24,13 @@ export const createJournal = async (req: Request, res: Response) => {
 
         const { title, content, tags, linkedTrade, mood, images } = validation.data;
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         const journal = await Journal.create({
-            user: req.user._id,
+            user: req.user._id as any,
             title,
             content,
             tags,
@@ -45,7 +50,11 @@ export const createJournal = async (req: Request, res: Response) => {
 // @access  Private
 export const getJournalEntries = async (req: Request, res: Response) => {
     try {
-        const entries = await Journal.find({ user: req.user._id })
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const entries = await Journal.find({ user: req.user._id as any })
             .populate('linkedTrade')
             .sort({ date: -1 });
         res.json(entries);
@@ -63,6 +72,11 @@ export const getJournalById = async (req: Request, res: Response) => {
 
         if (!entry) {
             res.status(404).json({ message: 'Journal entry not found' });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
             return;
         }
 
@@ -86,6 +100,11 @@ export const updateJournal = async (req: Request, res: Response) => {
 
         if (!entry) {
             res.status(404).json({ message: 'Journal entry not found' });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
             return;
         }
 
@@ -115,6 +134,11 @@ export const deleteJournal = async (req: Request, res: Response) => {
 
         if (!entry) {
             res.status(404).json({ message: 'Journal entry not found' });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
             return;
         }
 

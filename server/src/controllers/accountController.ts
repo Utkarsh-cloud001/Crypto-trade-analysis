@@ -8,12 +8,16 @@ import Trade from '../models/Trade';
 // @access  Private
 export const getAccounts = async (req: Request, res: Response) => {
     try {
-        const accounts = await Account.find({ user: req.user._id });
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+        const accounts = await Account.find({ user: req.user._id as any });
 
         // If no accounts exist, create a default one
         if (accounts.length === 0) {
             const defaultAccount = await Account.create({
-                user: req.user._id,
+                user: req.user._id as any,
                 name: 'Default Account',
                 isPrimary: true,
                 balance: 0
@@ -34,16 +38,21 @@ export const createAccount = async (req: Request, res: Response) => {
     try {
         const { name, balance, isPrimary } = req.body;
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         if (isPrimary) {
             // Unset other primary accounts
             await Account.updateMany(
-                { user: req.user._id, isPrimary: true },
+                { user: req.user._id as any, isPrimary: true },
                 { isPrimary: false }
             );
         }
 
         const account = await Account.create({
-            user: req.user._id,
+            user: req.user._id as any,
             name,
             balance: balance || 0,
             isPrimary: isPrimary || false
@@ -63,6 +72,11 @@ export const updateAccount = async (req: Request, res: Response) => {
         const { name, isPrimary } = req.body;
         const account = await Account.findById(req.params.id);
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         if (!account) {
             return res.status(404).json({ message: 'Account not found' });
         }
@@ -73,7 +87,7 @@ export const updateAccount = async (req: Request, res: Response) => {
 
         if (isPrimary) {
             await Account.updateMany(
-                { user: req.user._id, isPrimary: true },
+                { user: req.user._id as any, isPrimary: true },
                 { isPrimary: false }
             );
         }
@@ -95,6 +109,11 @@ export const deleteAccount = async (req: Request, res: Response) => {
     try {
         const account = await Account.findById(req.params.id);
 
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
+
         if (!account) {
             return res.status(404).json({ message: 'Account not found' });
         }
@@ -104,7 +123,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
         }
 
         // Prevent deleting the last account
-        const accountCount = await Account.countDocuments({ user: req.user._id });
+        const accountCount = await Account.countDocuments({ user: req.user._id as any });
         if (accountCount <= 1) {
             return res.status(400).json({ message: 'Cannot delete the only account' });
         }
@@ -139,6 +158,11 @@ export const addTransaction = async (req: Request, res: Response) => {
     try {
         const { type, amount, date, note } = req.body;
         const account = await Account.findById(req.params.id);
+
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
 
         if (!account) {
             return res.status(404).json({ message: 'Account not found' });
@@ -176,6 +200,11 @@ export const addTransaction = async (req: Request, res: Response) => {
 export const deleteTransaction = async (req: Request, res: Response) => {
     try {
         const transaction = await Transaction.findById(req.params.id);
+
+        if (!req.user) {
+            res.status(401).json({ message: 'User not authenticated' });
+            return;
+        }
 
         if (!transaction) {
             return res.status(404).json({ message: 'Transaction not found' });
