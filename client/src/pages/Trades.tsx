@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import api from '../services/api';
 import ImagePreviewModal from '../components/ImagePreviewModal';
+import { useCurrency } from '../context/CurrencyContext';
 
 // Get base URL for images
 const getBaseURL = () => {
@@ -36,6 +37,7 @@ const Trades = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const { formatCurrency } = useCurrency();
     const [formData, setFormData] = useState({
         pair: '',
         type: 'LONG' as 'LONG' | 'SHORT',
@@ -200,15 +202,17 @@ const Trades = () => {
                                             {trade.type}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">${trade.entryPrice.toFixed(2)}</td>
+                                    <td className="px-6 py-4">{formatCurrency(trade.entryPrice)}</td>
                                     <td className="px-6 py-4">{trade.amount}</td>
-                                    <td className="px-6 py-4 text-slate-400">${trade.fees || 0}</td>
+                                    <td className="px-6 py-4 text-slate-400">{formatCurrency(trade.fees || 0)}</td>
                                     <td className="px-6 py-4">
                                         {trade.pnl !== undefined ? (
                                             <span className={trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
-                                                ${trade.pnl.toFixed(2)}
+                                                {formatCurrency(trade.pnl)}
                                             </span>
-                                        ) : '-'}
+                                        ) : (
+                                            <span className="text-slate-500">-</span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-lg text-xs font-medium ${trade.status === 'OPEN' ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-500/10 text-slate-400'}`}>

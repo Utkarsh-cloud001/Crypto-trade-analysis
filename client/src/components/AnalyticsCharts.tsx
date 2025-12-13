@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useCurrency } from '../context/CurrencyContext';
 
 interface Trade {
     pair: string;
@@ -11,6 +12,7 @@ interface AnalyticsChartsProps {
 }
 
 const AnalyticsCharts = ({ trades }: AnalyticsChartsProps) => {
+    const { formatCurrency } = useCurrency();
     const closedTrades = trades.filter((t) => t.status === 'CLOSED');
     const winningTrades = closedTrades.filter((t) => (t.pnl || 0) > 0).length;
     const losingTrades = closedTrades.filter((t) => (t.pnl || 0) <= 0).length;
@@ -83,7 +85,7 @@ const AnalyticsCharts = ({ trades }: AnalyticsChartsProps) => {
                         <BarChart data={barData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                             <XAxis dataKey="pair" stroke="#94a3b8" style={{ fontSize: '12px' }} />
-                            <YAxis stroke="#94a3b8" style={{ fontSize: '12px' }} tickFormatter={(value) => `$${value}`} />
+                            <YAxis stroke="#94a3b8" style={{ fontSize: '12px' }} tickFormatter={(value) => formatCurrency(value)} />
                             <Tooltip
                                 contentStyle={{
                                     backgroundColor: '#1e293b',
@@ -91,7 +93,7 @@ const AnalyticsCharts = ({ trades }: AnalyticsChartsProps) => {
                                     borderRadius: '8px',
                                     color: '#fff',
                                 }}
-                                formatter={(value: number) => [`$${value.toFixed(2)}`, 'P&L']}
+                                formatter={(value: number) => [formatCurrency(value), 'P&L']}
                             />
                             <Bar dataKey="pnl" fill="#3b82f6" radius={[4, 4, 0, 0]}>
                                 {barData.map((entry, index) => (

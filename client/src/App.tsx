@@ -15,6 +15,7 @@ import HowItWorks from './pages/HowItWorks';
 import Terms from './pages/Terms';
 import Blog from './pages/Blog';
 import { AccountProvider } from './context/AccountContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 
@@ -64,13 +65,15 @@ const AnimatedRoutes = () => {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AccountProvider>
-          <AnimatedRoutes />
-        </AccountProvider>
-      </AuthProvider>
-    </Router>
+    <CurrencyProvider>
+      <Router>
+        <AuthProvider>
+          <AccountProvider>
+            <AnimatedRoutes />
+          </AccountProvider>
+        </AuthProvider>
+      </Router>
+    </CurrencyProvider>
   );
 }
 

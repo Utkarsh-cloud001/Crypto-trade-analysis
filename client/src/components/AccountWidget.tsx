@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { useAccount } from '../context/AccountContext';
+import { useCurrency } from '../context/CurrencyContext';
 import AccountModal from './AccountModal';
 
 const AccountWidget = () => {
     const { selectedAccount, loading } = useAccount();
+    const { formatCurrency } = useCurrency();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     if (loading) return <div className="p-4 text-slate-500 text-sm">Loading...</div>;
@@ -28,7 +31,7 @@ const AccountWidget = () => {
                 <div className="mt-3 flex justify-between items-center">
                     <span className="text-xs text-slate-500">Balance</span>
                     <span className="text-lg font-bold text-blue-400">
-                        ${selectedAccount.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {formatCurrency(selectedAccount.balance)}
                     </span>
                 </div>
             </button>

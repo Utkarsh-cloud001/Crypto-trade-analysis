@@ -3,8 +3,14 @@ import { TrendingUp, TrendingDown, Activity, PieChart, Calendar, Bitcoin, Dollar
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import TradeHeatmap from '../components/TradeHeatmap';
+import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown, Activity, PieChart, Calendar, Bitcoin, DollarSign } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import api from '../services/api';
+import TradeHeatmap from '../components/TradeHeatmap';
 import AnalyticsCharts from '../components/AnalyticsCharts';
 import LiveChartModal from '../components/LiveChartModal';
+import { useCurrency } from '../context/CurrencyContext';
 
 interface Trade {
     _id: string;
@@ -28,6 +34,7 @@ const Dashboard = () => {
         totalPnL: 0,
         openTrades: 0,
     });
+    const { formatCurrency } = useCurrency();
     const [showChartModal, setShowChartModal] = useState(false);
     const [selectedSymbol, setSelectedSymbol] = useState<'BTCUSDT' | 'ETHUSDT'>('BTCUSDT');
 
@@ -71,7 +78,7 @@ const Dashboard = () => {
         },
         {
             title: 'Total P&L',
-            value: `$${stats.totalPnL.toFixed(2)}`,
+            value: formatCurrency(stats.totalPnL),
             icon: stats.totalPnL >= 0 ? TrendingUp : TrendingDown,
             color: stats.totalPnL >= 0 ? 'from-green-500 to-emerald-500' : 'from-red-500 to-rose-500',
             textColor: stats.totalPnL >= 0 ? 'text-green-400' : 'text-red-400',
