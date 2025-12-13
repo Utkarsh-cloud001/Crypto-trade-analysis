@@ -27,6 +27,12 @@ interface Trade {
     fees?: number;
 }
 
+const COMMON_PAIRS = [
+    'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'XRP/USDT',
+    'ADA/USDT', 'AVAX/USDT', 'DOT/USDT', 'DOGE/USDT', 'LINK/USDT',
+    'MATIC/USDT', 'UNI/USDT', 'ATOM/USDT', 'LTC/USDT', 'NEAR/USDT'
+];
+
 const Trades = () => {
     const [trades, setTrades] = useState<Trade[]>([]);
     const [loading, setLoading] = useState(true);
