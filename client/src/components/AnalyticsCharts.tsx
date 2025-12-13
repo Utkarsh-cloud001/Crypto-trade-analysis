@@ -44,7 +44,7 @@ const AnalyticsCharts = ({ trades }: AnalyticsChartsProps) => {
                 <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     Win/Loss Ratio
                 </h3>
-                <div className="h-64">
+                <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
@@ -80,7 +80,7 @@ const AnalyticsCharts = ({ trades }: AnalyticsChartsProps) => {
                 <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     P&L by Pair
                 </h3>
-                <div className="h-64">
+                <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={barData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />

@@ -41,6 +41,8 @@ const Trades = () => {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const { formatCurrency } = useCurrency();
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [filteredPairs, setFilteredPairs] = useState<string[]>([]);
     const [formData, setFormData] = useState({
         pair: '',
         type: 'LONG' as 'LONG' | 'SHORT',
@@ -277,21 +279,48 @@ const Trades = () => {
                                 >
                                     <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Trade' : 'Add New Trade'}</h2>
                                     <form onSubmit={handleSubmit} className="space-y-4">
-                                        <Input
-                                            id="trade-pair"
-                                            name="pair"
-                                            label="Pair"
-                                            list="pair-options"
-                                            placeholder="BTC/USDT"
-                                            value={formData.pair}
-                                            onChange={(e) => setFormData({ ...formData, pair: e.target.value.toUpperCase() })}
-                                            required
-                                        />
-                                        <datalist id="pair-options">
-                                            {COMMON_PAIRS.map(pair => (
-                                                <option key={pair} value={pair} />
-                                            ))}
-                                        </datalist>
+                                        <div className="relative">
+                                            <Input
+                                                id="trade-pair"
+                                                name="pair"
+                                                label="Pair"
+                                                placeholder="BTC/USDT"
+                                                value={formData.pair}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.toUpperCase();
+                                                    setFormData({ ...formData, pair: value });
+                                                    setFilteredPairs(COMMON_PAIRS.filter(p => p.includes(value)));
+                                                    setShowSuggestions(true);
+                                                }}
+                                                onFocus={() => {
+                                                    setFilteredPairs(COMMON_PAIRS.filter(p => p.includes(formData.pair)));
+                                                    setShowSuggestions(true);
+                                                }}
+                                                onBlur={() => {
+                                                    // Delay hiding to allow click event to fire
+                                                    setTimeout(() => setShowSuggestions(false), 200);
+                                                }}
+                                                autoComplete="off"
+                                                required
+                                            />
+                                            {showSuggestions && filteredPairs.length > 0 && (
+                                                <div className="absolute z-[10000] w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                                                    {filteredPairs.map((pair) => (
+                                                        <button
+                                                            key={pair}
+                                                            type="button"
+                                                            className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+                                                            onClick={() => {
+                                                                setFormData(prev => ({ ...prev, pair }));
+                                                                setShowSuggestions(false);
+                                                            }}
+                                                        >
+                                                            {pair}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                         <div>
                                             <label className="text-sm font-medium text-slate-300 mb-2 block">Type</label>
                                             <div className="flex gap-4">

@@ -5,10 +5,13 @@ import User from '../models/User';
 import bcrypt from 'bcryptjs';
 
 // Setup Nodemailer transporter
+const smtpPort = Number(process.env.SMTP_PORT) || 587;
+
+// Setup Nodemailer transporter
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false, // true for 465, false for other ports
+    port: smtpPort,
+    secure: smtpPort === 465, // true for 465, false for other ports
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
