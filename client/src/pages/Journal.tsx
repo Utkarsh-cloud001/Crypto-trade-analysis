@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, Edit2, Smile, Meh, Frown } from 'lucide-react';
 import { Button } from '../components/ui/Button';
@@ -232,100 +233,103 @@ const Journal = () => {
             </div>
 
             {/* Add/Edit Entry Modal */}
-            <AnimatePresence>
-                {showModal && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-                        >
-                            <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Entry' : 'New Journal Entry'}</h2>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <Input
-                                    label="Title"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    required
-                                />
-                                <div>
-                                    <label className="text-sm font-medium text-slate-300 mb-2 block">Mood</label>
-                                    <div className="flex gap-2">
-                                        {(['EXCELLENT', 'GOOD', 'NEUTRAL', 'BAD', 'TERRIBLE'] as const).map((mood) => (
-                                            <button
-                                                key={mood}
-                                                type="button"
-                                                onClick={() => setFormData({ ...formData, mood })}
-                                                className={`p-3 rounded-lg border-2 transition-all ${formData.mood === mood
-                                                    ? 'border-blue-500 bg-blue-500/10'
-                                                    : 'border-slate-700 hover:border-slate-600'
-                                                    }`}
-                                            >
-                                                <div className="text-xs font-medium capitalize">{mood.toLowerCase()}</div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                <Input
-                                    label="Date (Optional)"
-                                    type="datetime-local"
-                                    value={formData.date}
-                                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                />
-                                <div>
-                                    <label className="text-sm font-medium text-slate-300 mb-2 block">Content</label>
-                                    <textarea
-                                        className="flex min-h-[150px] w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
-                                        placeholder="What happened today? What did you learn?"
-                                        value={formData.content}
-                                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+            {createPortal(
+                <AnimatePresence>
+                    {showModal && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+                            >
+                                <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Entry' : 'New Journal Entry'}</h2>
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <Input
+                                        label="Title"
+                                        value={formData.title}
+                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         required
                                     />
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium text-slate-300 mb-2 block">Attachments</label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        className="block w-full text-sm text-slate-400
-                                            file:mr-4 file:py-2 file:px-4
-                                            file:rounded-full file:border-0
-                                            file:text-sm file:font-semibold
-                                            file:bg-blue-500/10 file:text-blue-400
-                                            hover:file:bg-blue-500/20"
-                                    />
-                                    <div className="flex gap-2 mt-2">
-                                        {formData.images.map((img, i) => (
-                                            <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-700">
-                                                <img src={`${getBaseURL().replace(/\/api$/, '')}${img}`} alt="attachment" className="w-full h-full object-cover" />
-                                            </div>
-                                        ))}
+                                    <div>
+                                        <label className="text-sm font-medium text-slate-300 mb-2 block">Mood</label>
+                                        <div className="flex gap-2">
+                                            {(['EXCELLENT', 'GOOD', 'NEUTRAL', 'BAD', 'TERRIBLE'] as const).map((mood) => (
+                                                <button
+                                                    key={mood}
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, mood })}
+                                                    className={`p-3 rounded-lg border-2 transition-all ${formData.mood === mood
+                                                        ? 'border-blue-500 bg-blue-500/10'
+                                                        : 'border-slate-700 hover:border-slate-600'
+                                                        }`}
+                                                >
+                                                    <div className="text-xs font-medium capitalize">{mood.toLowerCase()}</div>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex gap-3 pt-4">
-                                    <Button type="submit" className="flex-1">
-                                        {editingId ? 'Update Entry' : 'Save Entry'}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => {
-                                            setShowModal(false);
-                                            setEditingId(null);
-                                            setFormData({ title: '', content: '', mood: 'NEUTRAL', images: [], date: '' });
-                                        }}
-                                        className="flex-1"
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+                                    <Input
+                                        label="Date (Optional)"
+                                        type="datetime-local"
+                                        value={formData.date}
+                                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                    />
+                                    <div>
+                                        <label className="text-sm font-medium text-slate-300 mb-2 block">Content</label>
+                                        <textarea
+                                            className="flex min-h-[150px] w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
+                                            placeholder="What happened today? What did you learn?"
+                                            value={formData.content}
+                                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-slate-300 mb-2 block">Attachments</label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            className="block w-full text-sm text-slate-400
+                                                file:mr-4 file:py-2 file:px-4
+                                                file:rounded-full file:border-0
+                                                file:text-sm file:font-semibold
+                                                file:bg-blue-500/10 file:text-blue-400
+                                                hover:file:bg-blue-500/20"
+                                        />
+                                        <div className="flex gap-2 mt-2">
+                                            {formData.images.map((img, i) => (
+                                                <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-700">
+                                                    <img src={`${getBaseURL().replace(/\/api$/, '')}${img}`} alt="attachment" className="w-full h-full object-cover" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3 pt-4">
+                                        <Button type="submit" className="flex-1">
+                                            {editingId ? 'Update Entry' : 'Save Entry'}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => {
+                                                setShowModal(false);
+                                                setEditingId(null);
+                                                setFormData({ title: '', content: '', mood: 'NEUTRAL', images: [], date: '' });
+                                            }}
+                                            className="flex-1"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </form>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 };

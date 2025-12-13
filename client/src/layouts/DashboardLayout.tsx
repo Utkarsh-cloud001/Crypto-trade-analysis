@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { TrendingUp, BarChart2, BookOpen, LogOut, User, LayoutDashboard, BarChart3, HelpCircle, Menu, X } from 'lucide-react';
+import { TrendingUp, BarChart2, BookOpen, LogOut, User, LayoutDashboard, BarChart3, HelpCircle, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import HelpWidget from '../components/HelpWidget';
 import AccountWidget from '../components/AccountWidget';
@@ -10,6 +10,7 @@ const DashboardLayout = () => {
     const { logout, user } = useAuth();
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const location = useLocation();
 
     // Close sidebar on route change (mobile)
@@ -32,67 +33,83 @@ const DashboardLayout = () => {
 
     const SidebarContent = () => (
         <>
-            <div className="p-6 pb-4 flex justify-between items-center">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    CryptoJournal
-                </h1>
-                {/* Mobile Close Button */}
+            <div className={`flex flex-col h-full ${isCollapsed ? 'items-center' : ''}`}>
+                <div className={`p-6 pb-4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+                    {!isCollapsed && (
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate">
+                            CryptoJournal
+                        </h1>
+                    )}
+                    {/* Mobile Close Button */}
+                    <button
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="md:hidden p-2 text-slate-400 hover:text-white"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+
+                    {/* Desktop Collapse Button */}
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="hidden md:flex p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors ml-auto"
+                    >
+                        {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+                    </button>
+                </div>
+
+                {!isCollapsed && <AccountWidget />}
+
+                {/* User Profile Section */}
+                {user && (
+                    <div className={`px-4 py-3 border-b border-slate-800/50 ${isCollapsed ? 'flex justify-center' : ''}`}>
+                        <Link to="/profile" className={`flex items-center gap-3 hover:bg-slate-800/30 p-2 rounded-lg transition-all group ${isCollapsed ? 'justify-center' : ''}`}>
+                            {(user as any).profilePicture ? (
+                                <img
+                                    src={(user as any).profilePicture}
+                                    alt={user.name}
+                                    className="w-10 h-10 rounded-full object-cover border-2 border-slate-700 group-hover:border-blue-500 transition-all"
+                                />
+                            ) : (
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                                    <User className="w-5 h-5 text-white" />
+                                </div>
+                            )}
+                            {!isCollapsed && (
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                                    <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                                </div>
+                            )}
+                        </Link>
+                    </div>
+                )}
+
+                <nav className="flex-1 space-y-2 p-4">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            title={isCollapsed ? item.name : ''}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${location.pathname === item.path
+                                ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
+                                } ${isCollapsed ? 'justify-center px-2' : ''}`}
+                        >
+                            <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+                            {!isCollapsed && <span>{item.name}</span>}
+                        </Link>
+                    ))}
+                </nav>
+
                 <button
-                    onClick={() => setIsSidebarOpen(false)}
-                    className="md:hidden p-2 text-slate-400 hover:text-white"
+                    onClick={handleLogout}
+                    title={isCollapsed ? 'Logout' : ''}
+                    className={`flex items-center gap-3 px-4 py-3 m-4 mt-auto rounded-lg text-red-400 hover:bg-red-500/10 transition-all duration-200 group border border-transparent hover:border-red-500/20 ${isCollapsed ? 'justify-center px-2' : ''}`}
                 >
-                    <X className="w-6 h-6" />
+                    <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+                    {!isCollapsed && <span>Logout</span>}
                 </button>
             </div>
-
-            <AccountWidget />
-
-            {/* User Profile Section */}
-            {user && (
-                <div className="px-4 py-3 border-b border-slate-800/50">
-                    <Link to="/profile" className="flex items-center gap-3 hover:bg-slate-800/30 p-2 rounded-lg transition-all group">
-                        {(user as any).profilePicture ? (
-                            <img
-                                src={(user as any).profilePicture}
-                                alt={user.name}
-                                className="w-10 h-10 rounded-full object-cover border-2 border-slate-700 group-hover:border-blue-500 transition-all"
-                            />
-                        ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                                <User className="w-5 h-5 text-white" />
-                            </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                            <p className="text-xs text-slate-400 truncate">{user.email}</p>
-                        </div>
-                    </Link>
-                </div>
-            )}
-
-            <nav className="flex-1 space-y-2 p-4">
-                {navItems.map((item) => (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${location.pathname === item.path
-                            ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                            : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
-                            }`}
-                    >
-                        <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        <span>{item.name}</span>
-                    </Link>
-                ))}
-            </nav>
-
-            <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-3 m-4 mt-auto rounded-lg text-red-400 hover:bg-red-500/10 transition-all duration-200 group border border-transparent hover:border-red-500/20"
-            >
-                <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                <span>Logout</span>
-            </button>
         </>
     );
 
@@ -145,7 +162,7 @@ const DashboardLayout = () => {
             </AnimatePresence>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex w-64 bg-slate-900/40 backdrop-blur-xl border-r border-slate-800 flex-col relative z-20 h-full">
+            <aside className={`hidden md:flex ${isCollapsed ? 'w-20' : 'w-64'} bg-slate-900/40 backdrop-blur-xl border-r border-slate-800 flex-col relative z-20 h-full transition-all duration-300`}>
                 <SidebarContent />
             </aside>
 
