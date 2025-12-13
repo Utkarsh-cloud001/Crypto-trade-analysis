@@ -14,7 +14,7 @@ interface JournalEntry {
     date: string;
     mood?: 'EXCELLENT' | 'GOOD' | 'NEUTRAL' | 'BAD' | 'TERRIBLE';
     tags?: string[];
-    tags?: string[];
+
     images?: string[];
 }
 
@@ -72,7 +72,6 @@ const Journal = () => {
             setEntries(res.data);
         } catch (error) {
             console.error('Failed to fetch journal entries:', error);
-        } finally {
         } finally {
             setLoading(false);
         }
