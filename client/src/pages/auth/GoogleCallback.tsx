@@ -21,7 +21,7 @@ const GoogleCallback = () => {
 
                     // Complete login
                     login(token, res.data);
-                    navigate('/');
+                    navigate('/dashboard');
                 } catch (error) {
                     console.error('Google Auth Success but Profile Fetch Failed:', error);
                     navigate('/login');
