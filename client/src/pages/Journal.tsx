@@ -4,6 +4,7 @@ import { Plus, Trash2, Edit2, Smile, Meh, Frown } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import api from '../services/api';
+import { getBaseURL } from '../utils/url';
 
 interface JournalEntry {
     _id: string;
@@ -216,12 +217,12 @@ const Journal = () => {
                                 {entry.images.map((img, i) => (
                                     <a
                                         key={i}
-                                        href={`http://localhost:5000${img}`}
+                                        href={`${getBaseURL().replace(/\/api$/, '')}${img}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-slate-700 hover:border-blue-500 transition-colors"
                                     >
-                                        <img src={`http://localhost:5000${img}`} alt="attachment" className="w-full h-full object-cover" />
+                                        <img src={`${getBaseURL().replace(/\/api$/, '')}${img}`} alt="attachment" className="w-full h-full object-cover" />
                                     </a>
                                 ))}
                             </div>
@@ -298,7 +299,7 @@ const Journal = () => {
                                     <div className="flex gap-2 mt-2">
                                         {formData.images.map((img, i) => (
                                             <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-700">
-                                                <img src={`http://localhost:5000${img}`} alt="attachment" className="w-full h-full object-cover" />
+                                                <img src={`${getBaseURL().replace(/\/api$/, '')}${img}`} alt="attachment" className="w-full h-full object-cover" />
                                             </div>
                                         ))}
                                     </div>
