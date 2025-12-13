@@ -381,8 +381,10 @@ const Profile = () => {
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">Name</label>
+                                <label htmlFor="profile-name" className="text-sm font-medium text-slate-300 mb-2 block">Name</label>
                                 <input
+                                    id="profile-name"
+                                    name="name"
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -391,8 +393,10 @@ const Profile = () => {
                                 />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">Email</label>
+                                <label htmlFor="profile-email" className="text-sm font-medium text-slate-300 mb-2 block">Email</label>
                                 <input
+                                    id="profile-email"
+                                    name="email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -413,8 +417,10 @@ const Profile = () => {
                         <h2 className="text-2xl font-bold mb-6">Account Settings</h2>
                         <form onSubmit={handleSettingsSubmit} className="space-y-6 max-w-lg">
                             <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">Currency</label>
+                                <label htmlFor="settings-currency" className="text-sm font-medium text-slate-300 mb-2 block">Currency</label>
                                 <select
+                                    id="settings-currency"
+                                    name="currency"
                                     value={currency}
                                     onChange={(e) => setCurrency(e.target.value)}
                                     className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
@@ -428,8 +434,10 @@ const Profile = () => {
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">Date Format</label>
+                                <label htmlFor="settings-dateFormat" className="text-sm font-medium text-slate-300 mb-2 block">Date Format</label>
                                 <select
+                                    id="settings-dateFormat"
+                                    name="dateFormat"
                                     value={dateFormat}
                                     onChange={(e) => setDateFormat(e.target.value)}
                                     className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
@@ -441,8 +449,10 @@ const Profile = () => {
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">PnL Type</label>
+                                <label htmlFor="settings-pnlType" className="text-sm font-medium text-slate-300 mb-2 block">PnL Type</label>
                                 <select
+                                    id="settings-pnlType"
+                                    name="pnlType"
                                     value={pnlType}
                                     onChange={(e) => setPnlType(e.target.value)}
                                     className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
@@ -543,8 +553,10 @@ const Profile = () => {
                                     <h3 className="text-xl font-bold mb-4">{editingTag ? 'Edit Tag' : 'Add Tag'}</h3>
                                     <form onSubmit={handleTagSubmit} className="space-y-4">
                                         <div>
-                                            <label className="text-sm font-medium text-slate-300 mb-2 block">Name</label>
+                                            <label htmlFor="tag-name" className="text-sm font-medium text-slate-300 mb-2 block">Name</label>
                                             <input
+                                                id="tag-name"
+                                                name="tagName"
                                                 type="text"
                                                 value={tagForm.name}
                                                 onChange={(e) => setTagForm({ ...tagForm, name: e.target.value })}
@@ -553,8 +565,10 @@ const Profile = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-sm font-medium text-slate-300 mb-2 block">Category</label>
+                                            <label htmlFor="tag-category" className="text-sm font-medium text-slate-300 mb-2 block">Category</label>
                                             <input
+                                                id="tag-category"
+                                                name="tagCategory"
                                                 type="text"
                                                 value={tagForm.category}
                                                 onChange={(e) => setTagForm({ ...tagForm, category: e.target.value })}
@@ -564,8 +578,10 @@ const Profile = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-sm font-medium text-slate-300 mb-2 block">Description (Optional)</label>
+                                            <label htmlFor="tag-description" className="text-sm font-medium text-slate-300 mb-2 block">Description (Optional)</label>
                                             <textarea
+                                                id="tag-description"
+                                                name="tagDescription"
                                                 value={tagForm.description}
                                                 onChange={(e) => setTagForm({ ...tagForm, description: e.target.value })}
                                                 className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-h-[80px]"

@@ -18,6 +18,7 @@ import { AccountProvider } from './context/AccountContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
+import GoogleCallback from './pages/auth/GoogleCallback';
 
 import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
@@ -42,6 +43,7 @@ const AnimatedRoutes = () => {
           <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
           <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
           <Route path="/reset-password/:token" element={<PageTransition><ResetPassword /></PageTransition>} />
+          <Route path="/auth/google/callback" element={<PageTransition><GoogleCallback /></PageTransition>} />
         </Route>
 
         {/* Protected Routes */}

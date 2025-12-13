@@ -13,6 +13,7 @@ import tagRoutes from './routes/tagRoutes';
 import statsRoutes from './routes/statsRoutes';
 import featureRoutes from './routes/featureRoutes';
 import accountRoutes from './routes/accountRoutes';
+import passport from './config/passport';
 import path from 'path';
 
 dotenv.config();
@@ -34,7 +35,8 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
     crossOriginEmbedderPolicy: false
 }));
-app.use(express.json({ limit: '10mb' })); // Increased limit for profile pictures (base64)
+app.use(express.json({ limit: '50mb' })); // Increased limit for Base64 images
+app.use(passport.initialize());
 
 // Rate Limiting
 const limiter = rateLimit({

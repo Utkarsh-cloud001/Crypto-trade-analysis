@@ -14,6 +14,7 @@ export interface IUser extends Document {
     };
     resetPasswordToken?: string;
     resetPasswordExpire?: Date;
+    googleId?: string;
     createdAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
@@ -43,6 +44,11 @@ const userSchema = new Schema<IUser>({
     profilePicture: {
         type: String,
         default: '',
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
     },
     settings: {
         currency: { type: String, default: 'USD' },
