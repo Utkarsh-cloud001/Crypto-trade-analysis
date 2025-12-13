@@ -405,7 +405,16 @@ const Trades = () => {
                                             hover:file:bg-blue-500/20"
                                     />
                                     {formData.screenshot && (
-                                        <p className="text-xs text-green-400">Image uploaded successfully!</p>
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <p className="text-xs text-green-400">Image uploaded successfully!</p>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData(prev => ({ ...prev, screenshot: '' }))}
+                                                className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                                            >
+                                                (Remove)
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                                 <div className="flex gap-3 pt-4">

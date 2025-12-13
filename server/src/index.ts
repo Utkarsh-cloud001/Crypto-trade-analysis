@@ -29,7 +29,9 @@ import { sanitizeInputs } from './middleware/securityMiddleware';
 // ... imports
 
 app.use(cors());
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(express.json({ limit: '10mb' })); // Increased limit for profile pictures (base64)
 
 // Rate Limiting
