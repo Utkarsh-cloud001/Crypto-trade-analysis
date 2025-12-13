@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
@@ -55,7 +56,17 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/features', featureRoutes);
 app.use('/api/accounts', accountRoutes);
 
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+app.use('/uploads', express.static(uploadsDir));
+
+// Handle 404 for uploads explicitly to prevent HTML response (fixes CORB)
+app.use('/uploads', (req, res) => {
+    res.status(404).send('Image not found');
+});
 
 app.get('/', (req, res) => {
     res.send('Crypto Trade Analysis API is running');
