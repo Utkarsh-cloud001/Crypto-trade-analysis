@@ -400,10 +400,10 @@ const LandingPage = () => {
                         {[...Array(2)].map((_, setIndex) => (
                             <div key={setIndex} className="flex gap-8">
                                 {[
-                                    { name: "Alex Thompson", role: "Pro Trader", text: "This journal completely changed how I view my trading. The AI insights helped me plug leaks I didn't even know I had." },
-                                    { name: "Sarah Chen", role: "Crypto Analyst", text: "The 3D visualization is a game changer. Being able to see my trade clusters in a spatial view helps me understand market structure like never before." },
-                                    { name: "Mike Ross", role: "Day Trader", text: "Finally, a journal that keeps up with the speed of crypto. The automated sync is flawless and the metrics are exactly what I need." },
-                                    { name: "Elena Rodriguez", role: "Portfolio Manager", text: "I manage multiple accounts across 5 exchanges. CryptoJournal brings everything into one beautiful, unified dashboard." }
+                                    { name: "Alex Thompson", role: "Pro Trader", image: "/testimonials/alex.png", text: "This journal completely changed how I view my trading. The AI insights helped me plug leaks I didn't even know I had." },
+                                    { name: "Sarah Chen", role: "Crypto Analyst", image: "/testimonials/sarah.png", text: "The 3D visualization is a game changer. Being able to see my trade clusters in a spatial view helps me understand market structure like never before." },
+                                    { name: "Mike Ross", role: "Day Trader", image: "/testimonials/mike.png", text: "Finally, a journal that keeps up with the speed of crypto. The automated sync is flawless and the metrics are exactly what I need." },
+                                    { name: "Elena Rodriguez", role: "Portfolio Manager", image: "/testimonials/elena.png", text: "I manage multiple accounts across 5 exchanges. CryptoJournal brings everything into one beautiful, unified dashboard." }
                                 ].map((testimonial, i) => (
                                     <motion.div
                                         key={`${setIndex}-${i}`}
@@ -411,7 +411,13 @@ const LandingPage = () => {
                                         className="w-[400px] p-6 rounded-2xl bg-slate-900/40 border border-slate-800 text-left hover:border-cyan-500/30 hover:bg-slate-900/60 transition-colors duration-300 group cursor-default flex-shrink-0"
                                     >
                                         <div className="flex items-center gap-4 mb-4">
-                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-700 to-slate-600 group-hover:from-cyan-500 group-hover:to-blue-600 transition-colors duration-300" />
+                                            <div className="w-12 h-12 rounded-full p-[2px] bg-gradient-to-br from-slate-700 to-slate-600 group-hover:from-cyan-500 group-hover:to-blue-600 transition-colors duration-300 overflow-hidden">
+                                                <img 
+                                                    src={testimonial.image} 
+                                                    alt={testimonial.name}
+                                                    className="w-full h-full rounded-full object-cover"
+                                                />
+                                            </div>
                                             <div>
                                                 <p className="font-bold text-white group-hover:text-cyan-400 transition-colors">{testimonial.name}</p>
                                                 <p className="text-sm text-slate-500">{testimonial.role}</p>
