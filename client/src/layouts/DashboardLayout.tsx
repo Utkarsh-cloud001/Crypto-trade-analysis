@@ -132,8 +132,16 @@ const DashboardLayout = () => {
                         CryptoJournal
                     </span>
                 </div>
-                <Link to="/profile" className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30 active:scale-95 transition-transform">
-                    <User className="w-5 h-5 text-blue-400" />
+                <Link to="/profile" className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30 active:scale-95 transition-transform overflow-hidden">
+                    {(user as any)?.profilePicture ? (
+                        <img
+                            src={(user as any).profilePicture}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <User className="w-5 h-5 text-blue-400" />
+                    )}
                 </Link>
             </header>
 
