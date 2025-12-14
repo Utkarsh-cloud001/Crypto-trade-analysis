@@ -50,36 +50,27 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
         console.log(`Attempting email connection to: ${smtpHost}:${smtpPort} (Secure: ${smtpPort === 465})`);
 
-        let transportConfig: any;
-
-        if (smtpHost.includes('gmail')) {
-            console.log('Using Gmail Service preset');
-            transportConfig = {
-                service: 'gmail',
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASS,
-                },
-            };
-        } else {
-            transportConfig = {
-                host: smtpHost,
-                port: smtpPort,
-                secure: smtpPort === 465,
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASS,
-                },
-            };
-        }
+        const transportConfig = {
+            host: smtpHost,
+            port: smtpPort,
+            secure: smtpPort === 465,
+            debug: true, // Show debug output
+            logger: true, // Log to console
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        };
 
         const transporter = nodemailer.createTransport(transportConfig);
 
         try {
-            await transporter.verify(); // Verify connection config before sending
+            console.log('Verifying SMTP connection...');
+            await transporter.verify();
+            console.log('SMTP connection verified successfully');
 
             await transporter.sendMail({
-                from: process.env.SMTP_USER, // Sender address
+                from: process.env.SMTP_USER,
                 to: user.email,
                 subject: 'Password Reset Request',
                 html: message,
