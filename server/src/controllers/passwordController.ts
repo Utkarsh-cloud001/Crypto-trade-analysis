@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import User from '../models/User';
-import bcrypt from 'bcryptjs';
+
+// Initialize Resend
+// Note: This requires RESEND_API_KEY in .env
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
 
 // @desc    Forgot Password
 // @route   POST /api/auth/forgot-password
@@ -33,63 +38,42 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
         const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
 
-        const message = `
+        const htmlMessage = `
             <h1>You have requested a password reset</h1>
             <p>Please go to this link to reset your password:</p>
-            <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+            <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
+            <p>If you did not request this, please ignore this email.</p>
         `;
 
-        // Check for SMTP config presence
-        if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-            console.error('Missing SMTP Credentials');
-            return res.status(500).json({ message: 'Server misconfiguration: Missing SMTP credentials in environment variables.' });
+        if (!process.env.RESEND_API_KEY) {
+            console.error('Missing RESEND_API_KEY');
+            return res.status(500).json({ message: 'Server misconfiguration: Missing Email API Key.' });
         }
 
-        const smtpPort = Number(process.env.SMTP_PORT) || 587;
-        const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-
-        console.log(`Attempting email connection to: ${smtpHost}:${smtpPort} (Secure: ${smtpPort === 465})`);
-
-        const transportConfig = {
-            host: smtpHost,
-            port: smtpPort,
-            secure: smtpPort === 465,
-            debug: true, // Show debug output
-            logger: true, // Log to console
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        };
-
-        const transporter = nodemailer.createTransport(transportConfig);
-
         try {
-            console.log('Verifying SMTP connection...');
-            await transporter.verify();
-            console.log('SMTP connection verified successfully');
-
-            await transporter.sendMail({
-                from: process.env.SMTP_USER,
+            const data = await resend.emails.send({
+                from: 'Crypto Trade Analysis <' + SENDER_EMAIL + '>',
                 to: user.email,
                 subject: 'Password Reset Request',
-                html: message,
+                html: htmlMessage,
             });
 
+            if (data.error) {
+                console.error('Resend API Error:', data.error);
+                throw new Error(data.error.message);
+            }
+
+            console.log('Email sent successfully:', data.data?.id);
             res.status(200).json({ success: true, data: 'Email sent' });
         } catch (error: any) {
             console.error('Email send failed:', error);
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
-
             await user.save();
 
-            // Return actual error message for debugging
             return res.status(500).json({
                 message: 'Email service failed',
-                error: error.message,
-                code: error.code,
-                command: error.command
+                error: error.message
             });
         }
     } catch (error: any) {
